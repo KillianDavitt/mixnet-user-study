@@ -1,0 +1,65 @@
+#+BEGIN_comment:
+purpose: to determine users level of tolerance for delay in collaborative applications.
+
+primarily focused on document editing.
+
+So the study will consist of changing the level of delay while a user completes a task.
+
+I am aiming for a within user design where the same user reports on the difference between the
+delays
+
+It is important that the experience of the users maximises the potential disruption caused by
+delays as this will hopefully give us a worst case scenario
+
+It is also important to reduce variability in the study; thus, the second user will be
+simulated.
+
+The exact task shall be one which provides a scenario where the participant and the user can
+and will accidentaly attempt to do the same thing.
+
+Therefore I propose the parcipiant be given a number of questions to fill in, in no particular
+order. This enables the second user to randomly fill in some answers, whilst the participant
+will likely 'jump around' the document filling in different answers as they rememeber them. The
+participant will either fill in their answer, or realise that they have tried the same question
+as the second user.
+
+Numbers of users?
+
+Questions to be asked?
+
+something like "Do you feel you and the other user were able to collaborate effectively?"
+
+mkturk?
+
+tech should create a new link for every participant linking them into the editing
+environment. Then it should tell them their task and let them go ahead. Then it should ask the
+questions afterwards.
+
+presumably i'll want to deploy on like s3 or something, so spin up this docker container or something?
+
+what could go wrong?:
+
+- participant is being slow and so the 2nd user fills in all data
+-
+
+problem: doing questions has a low chance of conflict I think, also it doesn't generalise well. in the paper: "look people can't tolerate delays of x", reviewer: "yeah but this wasn't a doc, all this means is people don't like delay in their questions". A proper doc which was designed to cause conflicts would be a much better choice. then we can present it as a worst case. Okay so we could have some thing like "list 10 events in order that they occurred". This would work well, but i'm concerned it would be really difficult to write the ai. In fact it would be impossible because id have to somehow find the semantics of what the participant writes. Okay what if it was a stupid ai. First it can write sentences but won't ever delete anything. It could literally not care what the participant does, and just always insert on the first line "pyramids built". Then it inserts on the last line "covid pandemic". Then it gets lines/2 and writes "moon landing". The question is will this introduce loads of conflicts. Well what would introduce the most conflicts. Probly people editing the actual sentences they write. So what to do next?
+
+hang on does this make any sense at all. The whole point is adding delay. But if the 2nd user does not change behaviour based on what the user inputs, then there is no difference. So either I do a test of 2 real people, or I make the ai react.
+
+Which latencies do I test? Like surely this is a terrible idea if I don't have some idea. What happens if all 3 I test are fully tolerable. I can do many sample tests with prolific
+
+Okay, so I know that I have to make the ai respond to user input, so maybe I will do the questions. Its not ideal but frankly, it would be very hard to make it behave properly in a doc format.
+
+
+okay do I need to include the crdt
+#+END_comment
+
+#+Title: User Study
+
+* Goals
+The goal of the user study will be to e
+* Questionaire
+
+* Task
+
+* Issues

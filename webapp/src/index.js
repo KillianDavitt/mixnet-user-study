@@ -2,16 +2,15 @@ import * as Automerge from '@automerge/automerge'
 var poissonProcess = require('poisson-process');
 
 let pdoc = Automerge.init()
-let sdoc = Automerge.init()
-
+let sdoc = Automerge.clone(pdoc)
+let userTokens = 0;
 
 pdoc = Automerge.change(pdoc, 'Add card', pdoc => {
-    pdoc.q=Array(8).fill('')
+    pdoc.q=Array(8).fill(new Automerge.Text(""))
 })
 
-sdoc = Automerge.change(sdoc, 'Add card', doc => {
-    doc.q=Array(8).fill('')
-})
+
+sdoc = Automerge.merge(sdoc,pdoc)
 
 
 pdoc = Automerge.change(pdoc, 'Mark card as done', pdoc => {
@@ -24,134 +23,111 @@ function getRandomInt(max) {
 
 const answers = ["Vienna","London","Paris", "Madrid", "Berlin", "Rome", "Dublin", "Moscow"]
 
-let copyOfAnswers = answers.map(s => Array.from(s))
-const copy = copyOfAnswers.map(x => x)
+const letters = answers.map(s => Array.from(s))
 
-/*
-const updateValue = (pick = getRandomInt(letters.length), input = document.getElementById(`answer${pick}`)) => {
+function __delay__(timer) {
+    return new Promise(resolve => {
+        timer = timer || 2000;
+        setTimeout(function () {
+            resolve();
+        }, timer);
+    });
+};
+
+const updateValue = async (strings = letters, word = [], id) => {
     // This delay simulates typing delay, not network delay
-    console.log("Started update value")
-    let delay = poissonProcess.sample(500)
-    let id;
-    id = copy.indexOf(letters[pick])
-    console.log(id)
-    console.log(pick)
-    if (letters[pick].length == 0) {
-	console.log("in if")
-	letters.splice(pick, 1)
-	delay+=1000
-	if (letters.length === 0) {
-	    return
-	}
-	
-	do {
-	    pick = getRandomInt(letters.length)
-	    id = copy.indexOf(letters[pick])
-	    input = document.getElementById(`answer${id}`)
-	    if (sdoc.q[id]!=''){
-		letters.splice(pick,1)
-	    }
-	} while (input.value!='')
-    }
-
-    const letter = letters[pick].splice(0, 1)
-    console.log(letter)
-    setTimeout(() => {
-	
-	sdoc = Automerge.change(sdoc, 'Add letter', doc => {
-	    doc.q[id]+= letter
-	})
-
-	// Network delay
-	let delay = poissonProcess.sample(5000)
-	// Merge CRDTs
-	setTimeout(() => {
-	    pdoc = Automerge.merge(pdoc, sdoc)
-	    input.value = pdoc.q[id]
-	}, delay)
-	
-	updateValue(pick, input)
-    }, delay)
-
-}*/
-
-const updateValue = (strings = copy, pick = getRandomInt(strings.length), input = document.getElementById(`answer${pick}`)) => {
-    // This delay simulates typing delay, not network delay
-    let delay = poissonProcess.sample(500)
-    let id;
-    id = copyOfAnswers.indexOf(strings[pick])
+    let delay = poissonProcess.sample(200)
    
-    if (strings[pick].length == 0) {
-
-	strings.splice(pick, 1)
-	delay+=1000
-	if (strings.length === 0) {
-	    return
-	}
+    if (word.length == 0) {
 	
 	do {
-	    pick = getRandomInt(strings.length)
-	    id = copyOfAnswers.indexOf(strings[pick])
-	    input = document.getElementById(`answer${id}`)
-	    if (sdoc.q[id]!=''){
-		strings.splice(pick,1)
+	    if (strings.length === 0) {
+		return
 	    }
+	    
+	    const pick = getRandomInt(strings.length)
+	    word = strings[pick]
+	    strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
+	    id = letters.indexOf(word)
 	} while (sdoc.q[id]!='')
     }
-
-    const letter = strings[pick].splice(0, 1)
+    
+    const input = document.getElementById(`answer${id}`)
+    const [letter,...rest] = word
     console.log(letter)
+
+    while (userTokens<1) {
+	await __delay__(1000)
+    }
     setTimeout(() => {
 	
 	sdoc = Automerge.change(sdoc, 'Add letter', doc => {
-	    doc.q[id]+= letter
+	    doc.q[id].insertAt(doc.q[id].length, letter)
 	})
 
 	// Network delay
-	let delay = poissonProcess.sample(5000)
+	let delay = poissonProcess.sample(delayParam)
 	// Merge CRDTs
 	setTimeout(() => {
-	    pdoc = Automerge.merge(pdoc, sdoc)
+	    let newDoc = Automerge.merge(pdoc, sdoc)
+	    pdoc = newDoc
 	    input.value = pdoc.q[id]
+	    console.log(id)
+	    console.log(pdoc.q)
+	    console.log(sdoc.q)
+	    updateValue(strings, rest, id)
 	}, delay)
-	let stringsCopy = strings.map(s => Array.from(s))
-	updateValue(stringsCopy, pick, input)
+	
+	
     }, delay)
-
+    let p = Math.random()
+    if (p<0.1){
+	userTokens=-2
+    } else if(p<0.6){
+	userTokens-=1
+    }
 }
 
 
 
-document.querySelector('#testbox').value=pdoc.test
-
-const numQuestions = 7;
+const numQuestions = 8;
 
 for (var i=0; i<numQuestions;i++){
     let typeInput = document.getElementById(`answer${i}`)
     console.log(`answer${i}`)
     console.log(pdoc.q[i])
-    //typeInput.onkeydown = updateValue()
+    
     typeInput.addEventListener( "keydown" ,
 			   (e) => {
 			       console.log(e.target)
 			       console.log(e.key)
+
+			       // Participants has typed, add a token or the script
+			       userTokens+=1;
 			       // Add leter to crdt
 			       pdoc = Automerge.change(pdoc, 'Add letter', doc => {
-				   doc.q[i]+=e.key
+				   console.log(doc.q)
+				   var num = e.target.getAttribute('num')
+				   console.log(num)
+				   try{
+				       doc.q[num].insertAt(doc.q[num].length, e.key)
+
+				   }
+				   catch(err){
+				       console.log(err.message)
+				       console.log(num)
+				       console.log(doc.q[num].length)
+				   }
+				   console.log("After insertion")
 			       })
-			       console.log(pdoc.q[i])
+			       //console.log(pdoc.q[num])
 			       // Delay
-			       let delay = poissonProcess.sample(1000)
+			       let delay = poissonProcess.sample(delayParam)
 			       // Merge CRDTs
 			       setTimeout(() => {
 				   sdoc = Automerge.merge(sdoc, pdoc)
 			       }, delay)
 			   })
-}
-
-function updateDoc(newDoc) {
-  doc = newDoc
-  render(newDoc)
 }
 
 
@@ -160,8 +136,6 @@ startInput.onclick = (ev) => {
   ev.preventDefault()
     updateValue()
 }
-
-
 
 function clearAll(){
     for (var i=0; i<answers.length;i++){
@@ -174,4 +148,5 @@ clearInput.onclick = (ev) => {
   ev.preventDefault()
     clearAll()
 }
+
 

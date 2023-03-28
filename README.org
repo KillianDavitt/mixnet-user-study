@@ -52,10 +52,32 @@ Okay, so I know that I have to make the ai respond to user input, so maybe I wil
 
 
 okay do I need to include the crdt
+
+
+
+The within subjects design is good for eliminating bias, we can discount problems like "people type at different speeds". This is a major factor.
+
+The issue with a between subjects is I need to come up with more questions that work well, and I need to be able to argue that people will know these questions just as well. Of course I can randomize them too.
+
+- Obviously a major metric is how long they take to finish!
+
+   Remember: user study delay must be a Poisson sample, can't be constant I think or it doesn't model mixnet properly
+
+  [[cite:&arapakisImpactResponseLatency2021]] This is definitely a key paper, the tests they use and such will be very useful I think.
+
+  [[cite:&baiUnderstandingLeveragingImpact2018]] less useful but shows some good standard questionaires I can sample from, csuq, and ueq
 #+END_comment
 
-#+Title: User Study
+* App internal design
+- two automerge instances
+  - 10 question boxes
+  - user types in their box.
+  - On letter entry, add letter to crdt, set value to crdt value
+  - On a delay of x, merge with the other crdt
 
+- independently:
+  - the script user randomly picks a question, checks if it is blank and then starts 'typing'. After every type, update the crdt, wait x delay and merge with the other crdt. Set the textbox to the merged value.
+      
 * Goals
 The goal of the user study will be to e
 * Questionaire

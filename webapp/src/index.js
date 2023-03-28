@@ -3,7 +3,8 @@ var poissonProcess = require('poisson-process');
 
 let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
-let userTokens = 0;
+let userTokens = 10000;
+const numQuestions = 6
 
 pdoc = Automerge.change(pdoc, 'Add card', pdoc => {
     pdoc.q=Array(8).fill(new Automerge.Text(""))
@@ -21,7 +22,10 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-const answers = ["Vienna","London","Paris", "Madrid", "Berlin", "Rome", "Dublin", "Moscow"]
+let answers = [numQuestions-1]
+for(var i=0; i<numQuestions; i++){
+    answers[i]=document.getElementById(`answer${i}`).getAttribute('answer')
+}
 
 const letters = answers.map(s => Array.from(s))
 
@@ -54,8 +58,8 @@ const updateValue = async (strings = letters, word = [], id) => {
     
     const input = document.getElementById(`answer${id}`)
     const [letter,...rest] = word
-    console.log(letter)
-
+    console.log("Current letter being typed:", letter)
+    console.log("Number of tokens: ", userTokens)
     while (userTokens<1) {
 	await __delay__(1000)
     }
@@ -72,35 +76,27 @@ const updateValue = async (strings = letters, word = [], id) => {
 	    let newDoc = Automerge.merge(pdoc, sdoc)
 	    pdoc = newDoc
 	    input.value = pdoc.q[id]
-	    console.log(id)
-	    console.log(pdoc.q)
-	    console.log(sdoc.q)
 	    updateValue(strings, rest, id)
+	    let p = Math.random()
+	    if (p<0.1){
+		userTokens-=2
+	    } else if(p<0.6){
+		userTokens-=1
+	    }
 	}, delay)
 	
 	
     }, delay)
-    let p = Math.random()
-    if (p<0.1){
-	userTokens=-2
-    } else if(p<0.6){
-	userTokens-=1
-    }
+    
 }
 
 
 
-const numQuestions = 8;
-
 for (var i=0; i<numQuestions;i++){
     let typeInput = document.getElementById(`answer${i}`)
-    console.log(`answer${i}`)
-    console.log(pdoc.q[i])
     
-    typeInput.addEventListener( "keydown" ,
+    typeInput.addEventListener( "input" ,
 			   (e) => {
-			       console.log(e.target)
-			       console.log(e.key)
 
 			       // Participants has typed, add a token or the script
 			       userTokens+=1;
@@ -118,7 +114,6 @@ for (var i=0; i<numQuestions;i++){
 				       console.log(num)
 				       console.log(doc.q[num].length)
 				   }
-				   console.log("After insertion")
 			       })
 			       //console.log(pdoc.q[num])
 			       // Delay
@@ -149,4 +144,4 @@ clearInput.onclick = (ev) => {
     clearAll()
 }
 
-
+updateValue()

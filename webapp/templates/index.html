@@ -14,14 +14,15 @@
 	      {{ question[0] }}
 	     </div>
 	     <div class="col">
-        <input type="text" id="answer{{ loop.index-1 }}" num={{ loop.index }} answer="{{ question[1] }}"/>
+        <input type="text" id="answer{{ loop.index-1 }}" num={{ loop.index-1 }} answer="{{ question[1] }}"/>
 	</div>
 	<div class="col-3">
 	  </div>
 </div>
        {% endfor %}
    
-<form action="/" method='POST'>
+       <form action="/" method='POST'>
+	 <input type="hidden" name="delay" value="{{ delay }}"/>
   <button class="btn btn-primary" id="submit">Submit</button>
 </form>
 {% if debug %}

@@ -1,14 +1,19 @@
 from flask import render_template, session, request, redirect
 from flask import Flask
 import random
+import sqlite3
 
 app = Flask(__name__,static_url_path='', 
             static_folder='static',
             template_folder='templates')
 
 app.secret_key = "dskfsdfds"
-delay_options = [1,500,1000]
+delay_options = [2000,3000,4000]
 
+def get_db_connection():
+    conn = sqlite3.connect('db.sqlite')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 with open('question_set1.csv') as f:
     data = f.readlines()
@@ -30,7 +35,17 @@ def run_survey_page():
     if 'filled' in request.form:
         print(request.form)
         # get all the survey.html results and record them
-
+        #prolific_id = session['prolific_id']
+        prolific_id = -1
+        delay = request.form['delay']
+        rating = request.form['rating']
+        review = request.form['review']
+        conn = get_db_connection()
+        conn.execute('INSERT INTO response (prolific_id, delay, review, rating) VALUES (?, ?, ?, ?)',
+                         (prolific_id, delay, review, rating))
+        conn.commit()
+        conn.close()
+        
         return redirect('/')
 
     try: 
@@ -46,8 +61,10 @@ def run_survey_page():
 
     completed_qs+=(qas)
     session['completed_qs'] = ','.join(completed_qs)
-    del session['current_qs']
-    return render_template('survey.html', debug=app.debug)
+    session.pop('current_qs', None)
+
+    delay = request.form['delay']
+    return render_template('survey.html', delay=delay, debug=app.debug)
 
 def run_questions_page():
     # Get the list of questions this user has already faced
@@ -91,7 +108,7 @@ def run_questions_page():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    app.debug=False
+    app.debug=True
 
     if 'consent' not in session:
         return run_consent_page()

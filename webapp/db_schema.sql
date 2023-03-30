@@ -1,0 +1,12 @@
+
+
+DROP TABLE IF EXISTS response;
+
+CREATE TABLE response (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    prolific_id STRING,
+    delay INTEGER NOT NULL,
+    review TEXT NOT NULL,
+    rating INTEGER NOT NULL
+);

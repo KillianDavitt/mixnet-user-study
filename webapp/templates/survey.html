@@ -72,19 +72,21 @@
 <br>
 
 <form action='/' method='POST'>
-    I was able to use the system effectively
+    I found working with the second user frustrating:
 <input type='hidden' name='filled'/>
 
 <div class="likert">
-    <label><input name="l" type="radio" value="1"/><span>I don’t like it at all</span></label>
-    <label><input name="l" type="radio" value="2"/><span>I don’t like it</span></label>
-    <label><input name="l" type="radio" value="3"/><span>I am indifferent</span></label>
-    <label><input name="l" type="radio" value="4"/><span>I like it</span></label>
-    <label><input name="l" type="radio" value="5"/><span>I like it a lot</span></label>
+    <label><input name="rating" type="radio" value="1"/><span>Not frustrating at all</span></label>
+    <label><input name="rating" type="radio" value="2"/><span>a tiny bit frustrating</span></label>
+    <label><input name="rating" type="radio" value="3"/><span>Slightly frustrating</span></label>
+    <label><input name="rating" type="radio" value="4"/><span>very frustrating</span></label>
+    <label><input name="rating" type="radio" value="5"/><span>Highly frustrating, not usable</span></label>
 </div>
-
-
-
+<br><br>
+Please leave a few words to review your experience: <br><br>
+<textarea name="review"></textarea>
+<br><br>
+<input type="hidden" name="delay" value="{{ delay }}" />
 
 <button class="btn">Next</button>
   </form>

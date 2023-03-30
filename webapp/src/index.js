@@ -14,14 +14,12 @@ pdoc = Automerge.change(pdoc, 'Add card', pdoc => {
 sdoc = Automerge.merge(sdoc,pdoc)
 
 
-pdoc = Automerge.change(pdoc, 'Mark card as done', pdoc => {
-  pdoc.test = 'hi'
-})
-
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+// The answers to the questions are populate by the flask template
+// so we fetch them from the dom
 let answers = [numQuestions-1]
 for(var i=0; i<numQuestions; i++){
     answers[i]=document.getElementById(`answer${i}`).getAttribute('answer')
@@ -29,7 +27,7 @@ for(var i=0; i<numQuestions; i++){
 
 const letters = answers.map(s => Array.from(s))
 
-function __delay__(timer) {
+function myDelay(timer) {
     return new Promise(resolve => {
         timer = timer || 2000;
         setTimeout(function () {
@@ -40,7 +38,7 @@ function __delay__(timer) {
 
 const updateValue = async (strings = letters, word = [], id) => {
     // This delay simulates typing delay, not network delay
-    let delay = poissonProcess.sample(200)
+    let delay = poissonProcess.sample(100)
    
     if (word.length == 0) {
 	
@@ -53,7 +51,7 @@ const updateValue = async (strings = letters, word = [], id) => {
 	    word = strings[pick]
 	    strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
 	    id = letters.indexOf(word)
-	} while (sdoc.q[id]!='')
+	} while (sdoc.q[id].toString()!="")
     }
     
     const input = document.getElementById(`answer${id}`)
@@ -61,7 +59,7 @@ const updateValue = async (strings = letters, word = [], id) => {
     console.log("Current letter being typed:", letter)
     console.log("Number of tokens: ", userTokens)
     while (userTokens<1) {
-	await __delay__(1000)
+	await myDelay(1000)
     }
     setTimeout(() => {
 	
@@ -73,8 +71,10 @@ const updateValue = async (strings = letters, word = [], id) => {
 	let delay = poissonProcess.sample(delayParam)
 	// Merge CRDTs
 	setTimeout(() => {
-	    let newDoc = Automerge.merge(pdoc, sdoc)
-	    pdoc = newDoc
+	    pdoc = Automerge.merge(pdoc, sdoc)
+	    sdoc = Automerge.merge(sdoc,pdoc)
+
+	    
 	    input.value = pdoc.q[id]
 	    updateValue(strings, rest, id)
 	    let p = Math.random()
@@ -106,21 +106,26 @@ for (var i=0; i<numQuestions;i++){
 				   var num = e.target.getAttribute('num')
 				   console.log(num)
 				   try{
-				       doc.q[num].insertAt(doc.q[num].length, e.key)
+				       doc.q[num].insertAt(doc.q[num].length, e.data)
 
 				   }
 				   catch(err){
+				       console.log(typeof(e.data))
 				       console.log(err.message)
 				       console.log(num)
 				       console.log(doc.q[num].length)
 				   }
 			       })
-			       //console.log(pdoc.q[num])
+
+			       console.log(pdoc)
+
 			       // Delay
 			       let delay = poissonProcess.sample(delayParam)
 			       // Merge CRDTs
 			       setTimeout(() => {
 				   sdoc = Automerge.merge(sdoc, pdoc)
+				   pdoc = Automerge.merge(pdoc, sdoc)
+
 			       }, delay)
 			   })
 }

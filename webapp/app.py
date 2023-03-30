@@ -8,7 +8,6 @@ app = Flask(__name__,static_url_path='',
 
 app.secret_key = "dskfsdfds"
 delay_options = [1,500,1000]
-app.debug = False
 
 
 with open('question_set1.csv') as f:
@@ -92,7 +91,7 @@ def run_questions_page():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    app.debug=True
+    app.debug=False
 
     if 'consent' not in session:
         return run_consent_page()

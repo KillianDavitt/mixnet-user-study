@@ -3,7 +3,7 @@ var poissonProcess = require('poisson-process');
 
 let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
-let userTokens = 10000;
+let userTokens = 10;
 const numQuestions = 6
 
 pdoc = Automerge.change(pdoc, 'Add card', pdoc => {
@@ -127,11 +127,12 @@ for (var i=0; i<numQuestions;i++){
 
 
 let startInput = document.querySelector("#start")
+if (startInput){
 startInput.onclick = (ev) => {
   ev.preventDefault()
     updateValue()
 }
-
+}
 function clearAll(){
     for (var i=0; i<answers.length;i++){
 	document.getElementById(`answer${i}`).value='';
@@ -139,9 +140,10 @@ function clearAll(){
 }
 
 let clearInput = document.querySelector("#clear")
+if (clearInput){
 clearInput.onclick = (ev) => {
   ev.preventDefault()
     clearAll()
 }
-
+}
 updateValue()

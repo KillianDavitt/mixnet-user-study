@@ -38,7 +38,7 @@ function myDelay(timer) {
 
 const updateValue = async (strings = letters, word = [], id) => {
     // This delay simulates typing delay, not network delay
-    let delay = poissonProcess.sample(100)
+    let typingDelay = poissonProcess.sample(500)
    
     if (word.length == 0) {
 	
@@ -56,37 +56,39 @@ const updateValue = async (strings = letters, word = [], id) => {
     
     const input = document.getElementById(`answer${id}`)
     const [letter,...rest] = word
-    console.log("Current letter being typed:", letter)
-    console.log("Number of tokens: ", userTokens)
+
     while (userTokens<1) {
 	await myDelay(1000)
     }
     setTimeout(() => {
+
+
+
+	updateValue(strings, rest, id)
+	let p = Math.random()
+	if (p<0.1){
+	    userTokens-=2
+	} else if(p<0.6){
+	    userTokens-=1
+	}
+
 	
 	sdoc = Automerge.change(sdoc, 'Add letter', doc => {
 	    doc.q[id].insertAt(doc.q[id].length, letter)
 	})
 
 	// Network delay
-	let delay = poissonProcess.sample(delayParam)
+	let networkDelay = poissonProcess.sample(delayParam)
 	// Merge CRDTs
 	setTimeout(() => {
 	    pdoc = Automerge.merge(pdoc, sdoc)
 	    sdoc = Automerge.merge(sdoc,pdoc)
-
-	    
 	    input.value = pdoc.q[id]
-	    updateValue(strings, rest, id)
-	    let p = Math.random()
-	    if (p<0.1){
-		userTokens-=2
-	    } else if(p<0.6){
-		userTokens-=1
-	    }
-	}, delay)
+
+	}, networkDelay)
+
 	
-	
-    }, delay)
+    }, typingDelay)
     
 }
 

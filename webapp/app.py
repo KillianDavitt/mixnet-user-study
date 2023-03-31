@@ -37,15 +37,18 @@ def run_survey_page():
         # get all the survey.html results and record them
         #prolific_id = session['prolific_id']
         prolific_id = -1
-        delay = request.form['delay']
-        rating = request.form['rating']
-        review = request.form['review']
-        conn = get_db_connection()
-        conn.execute('INSERT INTO response (prolific_id, delay, review, rating) VALUES (?, ?, ?, ?)',
+        try{
+                delay = request.form['delay']
+                rating = request.form['rating']
+                review = request.form['review']
+                conn = get_db_connection()
+                conn.execute('INSERT INTO response (prolific_id, delay, review, rating) VALUES (?, ?, ?, ?)',
                          (prolific_id, delay, review, rating))
-        conn.commit()
-        conn.close()
-        
+                conn.commit()
+                conn.close()
+        } catch(e) {
+            return "There was an error please contact the survey administrators"
+        }
         return redirect('/')
 
     try: 

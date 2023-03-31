@@ -37,7 +37,7 @@ def run_survey_page():
         # get all the survey.html results and record them
         #prolific_id = session['prolific_id']
         prolific_id = -1
-        try{
+        try:
                 delay = request.form['delay']
                 rating = request.form['rating']
                 review = request.form['review']
@@ -46,9 +46,9 @@ def run_survey_page():
                          (prolific_id, delay, review, rating))
                 conn.commit()
                 conn.close()
-        } catch(e) {
+        except(e):
             return "There was an error please contact the survey administrators"
-        }
+        
         return redirect('/')
 
     try: 

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>
+This survey will involve answers a series of general knowledge questions. You will be faced with 5 different question sets, each containing 10 questions. Each time you will see all ten questions at once and you can answer them in any order you wish.
+</p>
+<p>
+A simulated fake second user will be assisting you in answering these questions. This scripted user will randomly attempt to answer some of the questions for you. It will try to not answer questions you have already answered, or questions you are currently filling out. Similarly, you should not try to answer questions the simulated user is currently answering. Each question set however, will have a different level of added delay which will affect communication between you and the simulated user. Longer delays may mean you accidentally collide with each other, for example you may try and answer the same question at the same time which can cause difficulty.
+</p>
+<p>
+The goal of this study is to evaluate how well you can work with the simulated user at different levels of delay. It does not matter how long you take to finish, and you should not worry about getting the correct answer to every question. If you are unsure of an answer, you can submit your best guess.
+</p>
+<p>
+After each question set you will be given a very short questionnaire to ask you about your experience answering the questions.
+</p>
+<p>
+Please do not enter any personal information into any of the text boxes.  This will cause your submission to be deleted.
+</p>
+<p>
+Please answer the following questions to ensure you have understood the survey:
+</p>
+
+
+Who will be assisting you in answering the questions you are faced with?
+
+
+
+<form action='/' method='POST'>
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" value="1" name='q1' id="box1">
+  <label class="form-check-label" for="flexRadioDefault">
+     Another researcher from our team
+  </label>
+</div>
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" value="2" name="q1" id="box2">
+  <label class="form-check-label" for="flexRadioDefault">
+    A fake simulated user
+  </label>
+</div>
+
+<div class="form-check">
+  <input class="form-check-input" type="radio"  value="3" name="q1" id="box3" >
+  <label class="form-check-label" for="flexRadioDefault">
+    Another survey participant
+  </label>
+</div>
+<br>
+What is this survey attempting to measure?
+<br>
+<div class="form-check">
+  <input class="form-check-input" type="radio" valvue="4"  name="q2" id="box4"  >
+  <label class="form-check-label" for="flexRadioDefault">
+     The ability of participants to answer general knowledge questions
+  </label>
+</div>
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" value="5" name="q2" id="box4"  >
+  <label class="form-check-label" for="flexRadioDefault">
+     Whether humans can beat AI at answering questions
+  </label>
+</div>
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" value="6" name="q2" id="box4"  >
+  <label class="form-check-label" for="flexRadioDefault">
+     How collaboration is affected by added communication delays
+  </label>
+</div>
+
+  
+<button type="submit" class="btn btn-primary">Continue</button>
+</form>
+{% endblock %}

@@ -3,6 +3,7 @@ from flask import Flask
 import random
 import sqlite3
 
+
 app = Flask(__name__,static_url_path='', 
             static_folder='static',
             template_folder='templates')
@@ -15,21 +16,10 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-with open('question_set1.csv') as f:
+with open('questions.csv') as f:
     data = f.readlines()
 
 question_answers = [x.strip().split(',') for x in data]
-
-def run_consent_page():
-    if request.method == 'POST':
-        d = request.form
-        consent = d.get('1') and d.get('2') and d.get('3')
-        consent = consent and d.get('4') and d.get('5') and d.get('6')
-        print(consent)
-        session['consent'] = consent
-        return redirect('/')
-        
-    return render_template('consent.html', debug=app.debug)
 
 def run_survey_page():
     if 'filled' in request.form:
@@ -69,6 +59,8 @@ def run_survey_page():
     delay = request.form['delay']
     return render_template('survey.html', delay=delay, debug=app.debug)
 
+
+
 def run_questions_page():
     # Get the list of questions this user has already faced
     qas = []
@@ -80,7 +72,7 @@ def run_questions_page():
 
     try: 
         current_qs = session['current_qs'].split(',')
-        for i in range(6):
+        for i in range(10):
             qas.append(question_answers[int(current_qs[i])])
         
     except KeyError:
@@ -90,8 +82,8 @@ def run_questions_page():
     if len(completed_qs) >= len(question_answers):
         return render_template('end.html', debug=app.debug)
 
-    for i in range(6):
-        if len(current_qs)>5:
+    for i in range(10):
+        if len(current_qs)>9:
             break
         found_n = False
         while not found_n:
@@ -112,15 +104,41 @@ def run_questions_page():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     app.debug=True
-
+    print("consent is not in session?: ")
+    print('consent' not in session)
+    
+    
     if 'consent' not in session:
         return run_consent_page()
         
+    if 'education' not in session:
+        return run_education_page()
 
+    if 'first_attention_check' not in session:
+        return run_first_attention_page()
+    
     if not session['consent']:
         print("Error: bad state")
         session.pop('consent',None)
         return render_template('consent.html', debug=app.debug)
+
+    if not session['education']:
+        print("Error: bad state")
+        session.pop('education',None)
+        return render_template('consent.html', debug=app.debug)
+
+    if not session['first_attention_check']:
+        print("Error: bad state")
+        session.pop('first_attention',None)
+        return render_template('consent.html', debug=app.debug)
+
+    if session['failed_first_attention_check']:
+        if 'failed_second_attention_check' in session:
+            return render_template('failed.html', debug=app.debug)
+        return run_first_attention_page()
+
+    
+        
     
     if request.method == 'POST':
         return run_survey_page()
@@ -131,6 +149,56 @@ def index():
 def delete_cookies():
     session.pop('completed_qs', None)
     session.pop('consent',None)
-    print("Its still in the dict")
+    session.pop('education')
+    session.pop('failed_first_attention_check')
+    session.clear()
     print('consent' in session)
     return redirect('/')
+
+def run_first_attention_page():
+    if request.method == 'POST':
+        d = request.form
+        q1 = d.get('q1')
+        q2 = d.get('q2')
+        second=False
+        if 'failed_first_attention_check' in session:
+            if session['failed_first_attention_check'] == True:
+                second = True
+        if q1 != '2' and q2 != '6':
+            if second:
+                session['failed_second_attention_check'] = True
+            else:
+                session['failed_first_attention_check'] = True
+        else:
+            if second:
+                    session['failed_second_attention_check'] = False
+            else:
+                session['failed_first_attention_check'] = False
+
+        session['first_attention_check'] = True
+        return redirect('/')
+    return render_template('attention.html', debug=app.debug)
+
+
+def run_education_page():
+    if request.method == 'POST':
+        d = request.form
+        education = d.get('education')
+        #need to save edutation here...
+        session['education'] = True
+        return redirect('/')
+    return render_template('education.html', debug=app.debug)
+
+
+def run_consent_page():
+    if request.method == 'POST':
+        d = request.form
+        print(d)
+        print(d.get('1'))
+        consent = d.get('1') and d.get('2') and d.get('3')
+        consent = consent and d.get('4') and d.get('5') and d.get('6')
+        print(consent)
+        session['consent'] = consent
+        return redirect('/')
+        
+    return render_template('consent.html', debug=app.debug)

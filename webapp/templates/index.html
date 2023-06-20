@@ -9,11 +9,11 @@
        For each of the following countries, what is the capital city?<br><br>
        {% for question in qas %}
        <div class="row">
-	 <div class="col-3"></div>
-	   <div class="col">
+	 <div class="col-1"></div>
+	   <div class="col-5">
 	      {{ question[0] }}
 	     </div>
-	     <div class="col">
+	     <div class="col-5">
         <input type="text" id="answer{{ loop.index-1 }}" num={{ loop.index-1 }} answer="{{ question[1] }}"/>
 	</div>
 	<div class="col-3">

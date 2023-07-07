@@ -4,10 +4,10 @@ var poissonProcess = require('poisson-process');
 let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
 let userTokens = 10;
-const numQuestions = 6
+const numQuestions = 10
 
-pdoc = Automerge.change(pdoc, 'Add card', pdoc => {
-    pdoc.q=Array(8).fill(new Automerge.Text(""))
+pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {
+    pdoc.q=Array(10).fill(new Automerge.Text(""))
 })
 
 
@@ -18,7 +18,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-// The answers to the questions are populate by the flask template
+// The answers to the questions are populated by the flask template
 // so we fetch them from the dom
 let answers = [numQuestions-1]
 for(var i=0; i<numQuestions; i++){
@@ -153,4 +153,23 @@ clearInput.onclick = (ev) => {
     clearAll()
 }
 }
+var data = "MTMzLDExMSw3NCwxMzEsMTY0LDI1MSw5NiwxMjcsMCwxNDIsMiwyLDE2LDEwMiw4Myw1NCwxNCwxMjksMTQzLDc2LDE5NywxNjgsNjcsMTAxLDg1LDk4LDExNiwxNTUsNjcsMTYsMTA0LDI0MiwxMTEsMjA3LDMyLDk1LDc2LDE2MSwxNDcsMTkyLDIwOSwxNjMsMTcxLDQsMTg1LDQ4LDEsMTEwLDEyNywxMDksMTgwLDEzMSwxNTMsMjU1LDE0NCw0MCwyMDQsMjA5LDU0LDExMyw3NSwxMzAsMTczLDc2LDIzMyw3OSwyMjcsMTQ3LDIyNywyMzEsNjIsMTAzLDE4MiwxODAsMSw0LDE0Myw2MSwxMjcsOCwxLDQsMyw1LDE5LDQsMzUsMiw1MywzMCw2NCw0LDY3LDQsODYsMiwxMiwxLDQsMiwxMCwxNywxNiwxOSwyMiwyMSw1LDMzLDQsMzUsMTAsNTIsMiw2Niw2LDg2LDQsODcsMTgsMTI4LDEsMiwxMjcsMSwxOCwwLDEyNiwxLDAsMTcsMSwxMjcsMTEsMTgsMSwxOSwwLDEyNywxNiw2NywxMTQsMTAxLDk3LDExNiwxMDEsMzIsMTE2LDEwMSwxMjAsMTE2LDk4LDExMSwxMjAsMTAxLDExNSwxOCwxMCw2NSwxMDAsMTAwLDMyLDEwOCwxMDEsMTE2LDExNiwxMDEsMTE0LDEyNywwLDE4LDEsMTI3LDAsMTcsMSwxOSw3LDAsMSwyOCwxLDAsMSwxMCwxLDYsMiw1LDcsNywxMSwwLDIsOSwxLDAsMSw1LDAsMCwxLDQsMCwwLDEsNiwwLDAsMSwxMjYsMCwyLDgsMSwxMjYsMTE4LDEyLDQsMSwxMjYsMTEyLDI1LDMsMSwxMjYsMTAwLDE4LDUsMSwxMjcsMSwxMTMsMCwyOCwxMSwxLDE4LDAsMTcsMSwxMjcsOCw0LDEsMTI3LDExNyw2LDEsMSwyOCwxMjcsMiwxMCw0LDE4LDEsMTEsMCwxOCwyMiwzMiw4NCwxMTEsMTA3LDEyMSwxMTEsMzIsNjYsMTE0LDExNywxMTUsNjksMTEwLDEwMywxMDgsMTA1LDExNSwxMDQsMjksMCwxOA=="
+var d = atob(data)
+var a = Automerge.load(d)
+document.getElementById("submit_button").addEventListener("click", function (event) {
+        event.preventDefault();
+    saveAutomergeData()
+        document.getElementById("questions_form").submit();
+    });
+
 updateValue()
+
+
+function saveAutomergeData(){
+    console.log("Saving Automerge data...")
+    let binary = Automerge.save(sdoc)
+    let base = btoa(binary)
+    document.getElementById("automerge_data").value=base
+    
+    return
+}

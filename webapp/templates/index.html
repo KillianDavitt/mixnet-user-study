@@ -6,7 +6,7 @@
      <body>
        <h2>Please fill out these questions</h2>
 
-       For each of the following countries, what is the capital city?<br><br>
+       <br><br>
        {% for question in qas %}
        <div class="row">
 	 <div class="col-1"></div>
@@ -20,17 +20,22 @@
 	  </div>
 </div>
        {% endfor %}
-   
-       <form action="/" method='POST'>
+
+      
+       
+       <form action="/" id="questions_form" method='POST'>
 	 <input type="hidden" name="delay" value="{{ delay }}"/>
-  <button class="btn btn-primary" id="submit">Submit</button>
-</form>
+	 <input type="hidden" id='start_time' name='start_time' value=''/>
+	 <input type="hidden" id='automerge_data' name='automerge_data' value=''/>
+	 <button class="btn btn-primary" id="submit_button">Submit</button>
+       </form>
 {% if debug %}
   <button class="btn" id="start">Start</button>
   <button class="btn" id="clear">Clear</button>
 {% endif %}
 <script>
   const delayParam={{delay}};
+  document.getElementById('start_time').value = Date.now()
 </script>
 
 <script src="main.js"/>

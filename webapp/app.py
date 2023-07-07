@@ -2,14 +2,16 @@ from flask import render_template, session, request, redirect
 from flask import Flask
 import random
 import sqlite3
+import time
 
+num_questions = 10
 
 app = Flask(__name__,static_url_path='', 
             static_folder='static',
             template_folder='templates')
 
 app.secret_key = "dskfsdfds"
-delay_options = [2000,3000,4000]
+delay_options = [1000,2000,3000,4000]
 
 def get_db_connection():
     conn = sqlite3.connect('db.sqlite')
@@ -22,6 +24,7 @@ with open('questions.csv') as f:
 question_answers = [x.strip().split(',') for x in data]
 
 def run_survey_page():
+    session['prolific_id'] = -1
     if 'filled' in request.form:
         print(request.form)
         # get all the survey.html results and record them
@@ -31,12 +34,22 @@ def run_survey_page():
                 delay = request.form['delay']
                 rating = request.form['rating']
                 review = request.form['review']
-                conn = get_db_connection()
-                conn.execute('INSERT INTO response (prolific_id, delay, review, rating) VALUES (?, ?, ?, ?)',
-                         (prolific_id, delay, review, rating))
-                conn.commit()
-                conn.close()
-        except(e):
+                start_time = request.form['start_time']
+                end_time = time.time_ns() // 1_000_000
+
+                if 'results' not in session:
+                    session['results'] = []
+                result = {'delay':delay,
+                          'rating':rating,
+                          'review':review,
+                          'start_time':start_time,
+                          'end_time':end_time
+                          }
+                session['results'].append(result)
+                
+                
+        except Exception as err:
+            print(err)
             return "There was an error please contact the survey administrators"
         
         return redirect('/')
@@ -72,7 +85,7 @@ def run_questions_page():
 
     try: 
         current_qs = session['current_qs'].split(',')
-        for i in range(10):
+        for i in range(num_questions):
             qas.append(question_answers[int(current_qs[i])])
         
     except KeyError:
@@ -80,10 +93,21 @@ def run_questions_page():
         
     # Finished all available questions
     if len(completed_qs) >= len(question_answers):
+        # Time to write everything to the DB
+        try:
+            conn = get_db_connection()
+            results = session['results']
+            for r in results:
+                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, start_time, end_time, education) VALUES (?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['start_time'], r['end_time'], session['education_level']))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(e)
+            return "There was an error in savings your results to the database. Please contact the survey administrator."
         return render_template('end.html', debug=app.debug)
 
-    for i in range(10):
-        if len(current_qs)>9:
+    for i in range(num_questions):
+        if len(current_qs)>=num_questions:
             break
         found_n = False
         while not found_n:
@@ -96,8 +120,16 @@ def run_questions_page():
         current_qs.append(str(n))
         
     session['current_qs'] = ','.join(current_qs)
-    
-    delay = delay_options[random.randint(0,len(delay_options)-1)]
+
+    # Find a random delay which we haven't already used in this session
+    if 'delays' not in session:
+        session['delays'] = []
+    found_delay = False
+    while not found_delay:
+        delay = delay_options[random.randint(0,len(delay_options)-1)]
+        if not (delay in session['delays']):
+            found_delay=True
+    session['delays'].append(delay)
     
     return render_template('index.html', delay=delay, qas=qas, debug=app.debug)
 
@@ -147,12 +179,7 @@ def index():
 
 @app.route('/delete_cookies', methods=['GET'])
 def delete_cookies():
-    session.pop('completed_qs', None)
-    session.pop('consent',None)
-    session.pop('education')
-    session.pop('failed_first_attention_check')
     session.clear()
-    print('consent' in session)
     return redirect('/')
 
 def run_first_attention_page():
@@ -185,6 +212,7 @@ def run_education_page():
         d = request.form
         education = d.get('education')
         #need to save edutation here...
+        session['education_level'] = education
         session['education'] = True
         return redirect('/')
     return render_template('education.html', debug=app.debug)

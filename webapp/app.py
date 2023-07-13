@@ -54,6 +54,19 @@ def run_survey_page():
         
         return redirect('/')
 
+
+
+    # We need to save the automerge binary data in the session,
+    # then we can extract it at the end of the survey and commit to the db
+    if 'automerge_list' not in session:
+        automerge_list = list()
+        session['automerge_list'] = automerge_list
+    automerge_data = request.form['automerge_data']
+    automerge_list = session['automerge_list']
+    automerge_list.append(automerge_data)
+    session['automerge_list'] = automerge_list
+    print(automerge_list)
+    
     try: 
         completed_qs = session['completed_qs'].split(',')
             
@@ -68,7 +81,7 @@ def run_survey_page():
     completed_qs+=(qas)
     session['completed_qs'] = ','.join(completed_qs)
     session.pop('current_qs', None)
-
+    
     delay = request.form['delay']
     return render_template('survey.html', delay=delay, debug=app.debug)
 
@@ -97,8 +110,9 @@ def run_questions_page():
         try:
             conn = get_db_connection()
             results = session['results']
-            for r in results:
-                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, start_time, end_time, education) VALUES (?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['start_time'], r['end_time'], session['education_level']))
+            automerge_list = session['automerge_list']
+            for i,r in enumerate(results):
+                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, start_time, end_time, education, automerge_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['start_time'], r['end_time'], session['education_level'], automerge_list[i]))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -173,6 +187,7 @@ def index():
         
     
     if request.method == 'POST':
+       
         return run_survey_page()
 
     return run_questions_page()

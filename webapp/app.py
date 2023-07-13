@@ -35,7 +35,7 @@ def run_survey_page():
                 rating = request.form['rating']
                 review = request.form['review']
                 start_time = request.form['start_time']
-                end_time = time.time_ns() // 1_000_000
+                end_time = time.time_ns() // 1000000
 
                 if 'results' not in session:
                     session['results'] = []

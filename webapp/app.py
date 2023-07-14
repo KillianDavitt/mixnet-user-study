@@ -149,7 +149,7 @@ def run_questions_page():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    app.debug=True
+    app.debug=False
     print("consent is not in session?: ")
     print('consent' not in session)
     
@@ -229,7 +229,6 @@ def run_education_page():
         #need to save edutation here...
         session['education_level'] = education
         session['education'] = True
-        d['gdgfdg']
         return redirect('/')
     return render_template('education.html', debug=app.debug)
 
@@ -245,4 +244,4 @@ def run_consent_page():
         session['consent'] = consent
         return redirect('/')
         
-    return render_template('consent.html', debug=False)
+    return render_template('consent.html', debug=app.debug)

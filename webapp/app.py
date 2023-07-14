@@ -183,7 +183,8 @@ def index():
             return render_template('failed.html', debug=app.debug)
         return run_first_attention_page()
 
-    
+    if 'briefed' not in session:
+        return run_briefing()
         
     
     if request.method == 'POST':
@@ -196,6 +197,10 @@ def index():
 def delete_cookies():
     session.clear()
     return redirect('/')
+
+def run_briefing():
+    session['briefed']=True
+    return render_template('briefing.html')
 
 def run_first_attention_page():
     if request.method == 'POST':

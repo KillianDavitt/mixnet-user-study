@@ -80,8 +80,38 @@ The issue with a between subjects is I need to come up with more questions that 
       
 * Goals
 The goal of the user study will be to e
+
+What do I actually want. So I want to see what the effect is like. But what does this mean, what will a successful study look like. What if its:
+
+50ms, 300 seconds
+75ms 325 seconds
+100ms 350 seconds
+
+Well that probly means we didn't go far enough
+
+If the results aren't significant, that means we didn't space out the changes enough, or, the changes don't matter yet, so we didn't get far enough.
+
+What I kind of want to see is:
+
+50ms, 300 seconds
+75ms, 325 seconds,
+100ms 600 seconds
+150ms, 1200 seconds
+
+something like this would allow us to say theres a big dropoff past 75 so it would not be advisable to go past it.
 * Questionaire
 
 * Task
 
 * Issues
+
+* Sample size
+Trying here: https://www.gigacalculator.com/calculators/power-sample-size-calculator.php i'm not sure about some things but I got a figure of 36 which seems relatively normal.
+
+The thing I don't know is the population mean. So I guess i'm just guessing. This won't even be discussed in the paper, the only way this works out wrong is that I don't go big enough and therefore I don't detect an effect when there is one.
+
+Also if i'm making sure that 5 different times are significantly different to each other, how do I do that.
+
+potentially: 58 people, for 5 different latencies
+
+do a friedman test and a games howell

@@ -1,5 +1,6 @@
 from flask import render_template, session, request, redirect
 from flask import Flask
+from flask_session import Session
 import random
 import sqlite3
 import time
@@ -9,8 +10,11 @@ num_questions = 10
 app = Flask(__name__,static_url_path='', 
             static_folder='static',
             template_folder='templates')
-
 app.secret_key = "dskfsdfds"
+SESSION_TYPE = 'filesystem'
+secret_key= "fhdsfjd"
+app.config.from_object(__name__)
+Session(app)
 delay_options = [1000,2000,3000,4000]
 
 def get_db_connection():
@@ -35,8 +39,7 @@ def run_survey_page():
                 rating = request.form['rating']
                 review = request.form['review']
                 start_time = request.form['start_time']
-                end_time = int(round(time.time() * 1000000000))
- // 1000000
+                end_time = int(round(time.time() * 1000000000)) // 1000000
 
                 if 'results' not in session:
                     session['results'] = []

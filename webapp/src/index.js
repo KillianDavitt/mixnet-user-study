@@ -4,7 +4,9 @@ var poissonProcess = require('poisson-process');
 let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
 let userTokens = 6;
+
 const numQuestions = 10
+const typingDelay = 700
 
 pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {
     pdoc.q=Array(numQuestions).fill(new Automerge.Text(""))
@@ -38,7 +40,7 @@ function myDelay(timer) {
 
 const updateValue = async (strings = letters, word = [], id) => {
     // This delay simulates typing delay, not network delay
-    let typingDelay = poissonProcess.sample(500)
+    let typingDelay = poissonProcess.sample(typingDelay)
    
     if (word.length == 0) {
 	

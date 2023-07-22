@@ -15,7 +15,7 @@ SESSION_TYPE = 'filesystem'
 secret_key= "fhdsfjd"
 app.config.from_object(__name__)
 Session(app)
-delay_options = [1000,2000,3000,4000]
+delay_options = [1000,2000,3000,4000,0]
 
 def get_db_connection():
     conn = sqlite3.connect('db.sqlite')
@@ -26,7 +26,7 @@ with open('questions.csv') as f:
     data = f.readlines()
 
 question_answers = [x.strip().split(',') for x in data]
-
+print(question_answers)
 def run_survey_page():
     session['prolific_id'] = -1
     if 'filled' in request.form:

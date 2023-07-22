@@ -164,8 +164,9 @@ document.getElementById("submit_button").addEventListener("click", function (eve
         document.getElementById("questions_form").submit();
     });
 
+if (delayParam != 0) {
 updateValue()
-
+}
 
 function saveAutomergeData(){
     console.log("Saving Automerge data...")

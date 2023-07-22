@@ -1,7 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<script>
+  function returnToProlific(){
+      window.location = "https://app.prolific.co/submissions/complete?cc=CVAJSGEA";
+  }
+</script>
 <h3>End of study</h3>
-Thank you for taking the survey, you will now be redirected to prolific
+Thank you for participating in our study. Please click the continue button to be redirected back to Prolific where your completion will be registered.
+<br><br>
+Please note that any personal information you may have entered in the survey will be deleted by the researchers.
+<br><br>
 
+If you are interested in the results of our study, they will be made available in the coming weeks at https://killiandavitt.me/collaboration-user-study
+<br><br>
+Once again, if you have any questions about the survey please contact us through the Prolific interface.
+If you wish to email us directly, please do not include any personal information, and in particular do not include your prolific id.
+<br><br>
+Killian Davitt, killian.davitt.17@ucl.ac.uk<br>
+Steven Murdoch, s.murdoch@ucl.ac.uk
+<br><br>
+<button onclick=returnToProlific()>Continue</button>
 {% endblock %}

@@ -5,7 +5,7 @@ import random
 import sqlite3
 import time
 
-num_questions = 10
+num_questions = 14
 
 app = Flask(__name__,static_url_path='', 
             static_folder='static',
@@ -153,6 +153,10 @@ def run_questions_page():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    prolific_id = request.args.get('PROLIFIC_PID')
+    if prolific_id is not None:
+        session['prolific_id']=prolific_id
+    
     app.debug=False
     print("consent is not in session?: ")
     print('consent' not in session)

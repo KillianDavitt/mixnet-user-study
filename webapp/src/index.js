@@ -5,7 +5,7 @@ let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
 let userTokens = 6;
 
-const numQuestions = 10
+const numQuestions = 14
 const typingDelayParam = 700
 
 pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {

@@ -10,6 +10,8 @@
        <br><br>
        <h2>Please fill out these questions</h2>
 
+       This is task {{ current_task_num }} of 5. 
+       
        <br><br>
        {% for question in qas %}
        <div class="row">
@@ -38,7 +40,6 @@
   <button class="btn" id="clear">Clear</button>
 {% endif %}
 <script>
-  const delayParam={{delay}};
   document.getElementById('start_time').value = Date.now()
 </script>
 

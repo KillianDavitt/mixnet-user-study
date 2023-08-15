@@ -9,9 +9,6 @@
   list-style-type: none;
   }
 */
-
-    
-
     .likert {
         --likert-rows: 5;
         display: inline-grid;
@@ -66,8 +63,9 @@
     
 
   
-  </style>
-<h2>Please answer some questions on your experience</h2>
+</style>
+<br><br>
+<h2>Please answer some questions on the experience you just had with the second user</h2>
 
 <br>
 
@@ -83,8 +81,38 @@
     <label><input name="rating" type="radio" value="5"/><span>Highly frustrating, not usable</span></label>
 </div>
 <br><br>
-Please leave a few words to review your experience: <br><br>
-<textarea name="review" maxlength="1000"></textarea>
+    What effect did the 2nd user have on how long it took to complete the task:
+
+<div class="likert">
+    <label><input name="speed_rating" type="radio" value="1"/><span>Much slower</span></label>
+    <label><input name="speed_rating" type="radio" value="2"/><span>Slightly slower</span></label>
+    <label><input name="speed_rating" type="radio" value="3"/><span>No change</span></label>
+    <label><input name="speed_rating" type="radio" value="4"/><span>slightly quicker</span></label>
+    <label><input name="speed_rating" type="radio" value="5"/><span>Much more quickly</span></label>
+</div>
+
+<br><br>
+    Did you have to adapt your actions because the 2nd user was unpredictable? If yes, please describe how below.<br>
+
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" value="True" name='adapted' id="box1" required>
+  <label class="form-check-label" for="flexRadioDefault">
+     Yes
+  </label>
+</div>
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" value="False" name="adapted" id="box2" required>
+  <label class="form-check-label" for="flexRadioDefault">
+    No
+  </label>
+</div>
+
+
+<br><br>
+Please leave a few words to review your experience of working with the second user: <br><br>
+<textarea name="review" class="form-control" maxlength="1000"></textarea>
 <br><br>
 <input type="hidden" name="delay" value="{{ delay }}" />
  <input type="hidden" id='start_time' name='start_time' value=''/>

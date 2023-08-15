@@ -15,7 +15,7 @@ SESSION_TYPE = 'filesystem'
 secret_key= "fhdsfjd"
 app.config.from_object(__name__)
 Session(app)
-delay_options = [1000,2000,3000,4000,0]
+delay_options = [2000,4000,6000,8000,0]
 
 def get_db_connection():
     conn = sqlite3.connect('db.sqlite')
@@ -26,17 +26,18 @@ with open('questions.csv') as f:
     data = f.readlines()
 
 question_answers = [x.strip().split(',') for x in data]
-print(question_answers)
+
 def run_survey_page():
     session['prolific_id'] = -1
     if 'filled' in request.form:
         print(request.form)
         # get all the survey.html results and record them
-        #prolific_id = session['prolific_id']
         prolific_id = -1
         try:
                 delay = request.form['delay']
                 rating = request.form['rating']
+                speed_rating = request.form['speed_rating']
+                adapted = (request.form['adapted']=='True')
                 review = request.form['review']
                 start_time = request.form['start_time']
                 end_time = int(round(time.time() * 1000000000)) // 1000000
@@ -45,6 +46,8 @@ def run_survey_page():
                     session['results'] = []
                 result = {'delay':delay,
                           'rating':rating,
+                          'speed_rating':speed_rating,
+                          'adapted':adapted,
                           'review':review,
                           'start_time':start_time,
                           'end_time':end_time
@@ -107,6 +110,8 @@ def run_questions_page():
         
     except KeyError:
         current_qs = []
+
+    current_task_num = int(len(completed_qs)/num_questions)
         
     # Finished all available questions
     if len(completed_qs) >= len(question_answers):
@@ -116,7 +121,7 @@ def run_questions_page():
             results = session['results']
             automerge_list = session['automerge_list']
             for i,r in enumerate(results):
-                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, start_time, end_time, education, automerge_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['start_time'], r['end_time'], session['education_level'], automerge_list[i]))
+                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, speed_rating, adapted, start_time, end_time, education, automerge_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['speed_rating'],r['adapted'],r['start_time'], r['end_time'], session['education_level'], automerge_list[i]))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -149,7 +154,7 @@ def run_questions_page():
             found_delay=True
     session['delays'].append(delay)
     
-    return render_template('index.html', delay=delay, qas=qas, debug=app.debug)
+    return render_template('index.html', delay=delay, qas=qas, debug=app.debug, current_task_num=current_task_num)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -238,9 +243,11 @@ def run_first_attention_page():
 def run_education_page():
     if request.method == 'POST':
         d = request.form
-        education = d.get('education')
+        education = d.get('education_level')
         #need to save edutation here...
         session['education_level'] = education
+        print(education)
+        print('dklskdnsdkfnldf')
         session['education'] = True
         return redirect('/')
     return render_template('education.html', debug=app.debug)

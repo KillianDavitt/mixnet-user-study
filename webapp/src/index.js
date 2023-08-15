@@ -6,7 +6,7 @@ let sdoc = Automerge.clone(pdoc)
 let userTokens = 6;
 
 const numQuestions = 14
-const typingDelayParam = 700
+var typingDelayParam = 700
 
 pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {
     pdoc.q=Array(numQuestions).fill(new Automerge.Text(""))
@@ -41,7 +41,8 @@ function myDelay(timer) {
 const updateValue = async (strings = letters, word = [], id) => {
     // This delay simulates typing delay, not network delay
     let typingDelay = poissonProcess.sample(typingDelayParam)
-   
+
+    // If exhausted current word, select a new word
     if (word.length == 0) {
 	
 	do {
@@ -60,11 +61,52 @@ const updateValue = async (strings = letters, word = [], id) => {
     const [letter,...rest] = word
 
     while (userTokens<1) {
-	await myDelay(1000)
+	await myDelay(2000)
+	console.log("reduced")
+	typingDelayParam+=30
     }
     setTimeout(() => {
 
+	// Check if current value is a substring of end value
+	if (!(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
+	    console.log("CONFLICT");
+	    console.log(letters[id].join(''))
+	    console.log(sdoc.q[id].toString())
+	    // Theres a conflict, wait x seconds for the user to fix the box
+	   
+setTimeout(() => {
+	    // Check if the conflict is resolved...
+    if((letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
+		// Conflict fixed, mark this word as finished and move to next
+		// This should all the fun with blank word and cause it to pick a new one
+		// Then return to stop this word completing...
+		updateValue(strings, '', id)
+		return
+	    } else {
+		// Conflict still exists, user must have backed off
+		// Delete contents of box and start typing again.
+		let networkDelay = poissonProcess.sample(delayParam)
+		sdoc = Automerge.change(sdoc, 'delete and start again', doc => {
+		    var l=doc.q[id].length;
+		    var j=0;
+		    while(j<i){
+			doc.q[id].deleteAt(0);
+			j++;
+		    }
+		})
+		setTimeout(() => {
+		    pdoc = Automerge.merge(pdoc, sdoc)
+		    sdoc = Automerge.merge(sdoc,pdoc)
+		    input.value = pdoc.q[id]
 
+		}, networkDelay)
+		updateValue(strings, letters[id], id)
+		return
+	    }
+	    
+},10000)
+	   return
+	}
 
 	updateValue(strings, rest, id)
 	let p = Math.random()
@@ -104,11 +146,13 @@ for (var i=0; i<numQuestions;i++){
 
 			       // Participants has typed, add a token or the script
 			       userTokens+=1;
+			       if (userTokens>10){
+				   typingDelayParam-=30
+				   console.log("increased")
+			       }
 			       // Add leter to crdt
 			       pdoc = Automerge.change(pdoc, 'Add letter', doc => {
-				   console.log(doc.q)
 				   var num = e.target.getAttribute('num')
-				   console.log(num)
 				   try{
 				       doc.q[num].insertAt(doc.q[num].length, e.data)
 
@@ -121,7 +165,6 @@ for (var i=0; i<numQuestions;i++){
 				   }
 			       })
 
-			       console.log(pdoc)
 
 			       // Delay
 			       let delay = poissonProcess.sample(delayParam)

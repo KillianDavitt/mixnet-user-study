@@ -1,5 +1,5 @@
 from flask import render_template, session, request, redirect
-from flask import Flask
+from flask import Flask, send_file
 from flask_session import Session
 import random
 import sqlite3
@@ -16,6 +16,11 @@ secret_key= "fhdsfjd"
 app.config.from_object(__name__)
 Session(app)
 delay_options = [2000,4000,6000,8000,0]
+
+@app.route('/c129ad2439821907f5fd.module.wasm')
+def wasm_file():
+    return send_file('static/c129ad2439821907f5fd.module.wasm', mimetype = 'application/wasm');
+
 
 def get_db_connection():
     conn = sqlite3.connect('db.sqlite')

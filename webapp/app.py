@@ -33,11 +33,11 @@ with open('questions.csv') as f:
 question_answers = [x.strip().split(',') for x in data]
 
 def run_survey_page():
-    session['prolific_id'] = -1
+    #session['prolific_id'] = -1
     if 'filled' in request.form:
-        print(request.form)
+        #print(request.form)
         # get all the survey.html results and record them
-        prolific_id = -1
+        #prolific_id = -1
         try:
                 delay = request.form['delay']
                 rating = request.form['rating']
@@ -58,11 +58,13 @@ def run_survey_page():
                           'end_time':end_time
                           }
                 session['results'].append(result)
-                
+                session['completed_delays'].append(delay)
+                session['current_delay'] = None
                 
         except Exception as err:
             print(err)
-            return "There was an error please contact the survey administrators"
+            return str(err)
+            #return "There was an error please contact the survey administrators"
         
         return redirect('/')
 
@@ -97,9 +99,16 @@ def run_survey_page():
     delay = request.form['delay']
     return render_template('survey.html', delay=delay, debug=app.debug)
 
-
+@app.route('/register_prolific_id')
+def register_prolific_id():
+    prolific_id = request.args.get('prolific_id')
+    session['prolific_id'] = prolific_id
+    return redirect('/')
 
 def run_questions_page():
+    if 'prolific_id' not in session:
+        return render_template('prolific_id.html')
+    
     # Get the list of questions this user has already faced
     qas = []
     try: 
@@ -139,6 +148,7 @@ def run_questions_page():
             break
         found_n = False
         while not found_n:
+            print("finding questions")
             n = random.randint(0,len(question_answers)-1)
             print(n)
             if not str(n) in completed_qs+current_qs:
@@ -150,28 +160,45 @@ def run_questions_page():
     session['current_qs'] = ','.join(current_qs)
 
     # Find a random delay which we haven't already used in this session
-    if 'delays' not in session:
-        session['delays'] = []
-    found_delay = False
-    while not found_delay:
-        delay = delay_options[random.randint(0,len(delay_options)-1)]
-        if not (delay in session['delays']):
-            found_delay=True
-    session['delays'].append(delay)
+
+    try: 
+        completed_delays = session['completed_delays']
+        
+    except KeyError:
+        completed_delays = []
+        session['completed_delays'] = []
+        
+    try: 
+        current_delay = session['current_delay']
+        
+    except KeyError:
+        current_delay = None
     
-    return render_template('index.html', delay=delay, qas=qas, debug=app.debug, current_task_num=current_task_num)
+
+    found_delay = False
+    if current_delay != None:
+        found_delay = True
+        delay = current_delay
+    while not found_delay:
+        print("finding delay")
+        delay = delay_options[random.randint(0,len(delay_options)-1)]
+        if not (delay in session['completed_delays']):
+            found_delay=True
+            session['current_delay'] = delay
+            current_delay = delay
+   
+    
+    return render_template('index.html', delay=delay, qas=qas, debug=app.debug, current_task_num=current_task_num+1)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     prolific_id = request.args.get('PROLIFIC_PID')
     if prolific_id is not None:
         session['prolific_id']=prolific_id
-    
+
     app.debug=False
-    print("consent is not in session?: ")
-    print('consent' not in session)
-    
-    
+ 
+
     if 'consent' not in session:
         return run_consent_page()
         

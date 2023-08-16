@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br><br><br><br><br>
+<h4>Please enter your prolific ID.</h4>
+<form class="needs-validation" data-toggle="validator" action='/register_prolific_id' method='GET'>
+
+<input name='prolific_id' />
+
+  
+<button type="submit" class="btn btn-primary">Continue</button>
+</form>
+{% endblock %}

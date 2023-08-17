@@ -163,6 +163,7 @@ def run_questions_page():
 
     try: 
         completed_delays = session['completed_delays']
+        print(completed_delays)
         
     except KeyError:
         completed_delays = []
@@ -182,7 +183,7 @@ def run_questions_page():
     while not found_delay:
         print("finding delay")
         delay = delay_options[random.randint(0,len(delay_options)-1)]
-        if not (delay in session['completed_delays']):
+        if not (str(delay) in completed_delays):
             found_delay=True
             session['current_delay'] = delay
             current_delay = delay

@@ -112,7 +112,7 @@ setTimeout(() => {
 	let p = Math.random()
 	if (p<0.1){
 	    userTokens-=2
-	} else if(p<0.6){
+	} else if(p<0.9){
 	    userTokens-=1
 	}
 

@@ -7,6 +7,8 @@ CREATE TABLE response (
     rating INTEGER NOT NULL, 
     start_time uint, 
     end_time uint, 
+    client_start_time uint, 
+    client_end_time uint, 
     education VARCHAR(50), 
     automerge_data VARCHAR(100000), 
     speed_rating uint, 

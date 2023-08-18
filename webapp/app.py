@@ -44,9 +44,16 @@ def run_survey_page():
                 speed_rating = request.form['speed_rating']
                 adapted = (request.form['adapted']=='True')
                 review = request.form['review']
-                start_time = request.form['start_time']
-                end_time = int(round(time.time() * 1000000000)) // 1000000
+                
 
+                start_time = session['start_time']
+                end_time = session['end_time']
+                session['start_time'] = 0
+                session['end_time'] = 0
+
+                client_start_time = session['client_start_time']
+                client_end_time = session['client_end_time']
+                
                 if 'results' not in session:
                     session['results'] = []
                 result = {'delay':delay,
@@ -55,7 +62,9 @@ def run_survey_page():
                           'adapted':adapted,
                           'review':review,
                           'start_time':start_time,
-                          'end_time':end_time
+                          'end_time':end_time,
+                          'client_start_time':client_start_time,
+                          'client_end_time':client_end_time
                           }
                 session['results'].append(result)
                 session['completed_delays'].append(delay)
@@ -79,7 +88,10 @@ def run_survey_page():
     automerge_list = session['automerge_list']
     automerge_list.append(automerge_data)
     session['automerge_list'] = automerge_list
-    print(automerge_list)
+
+    session['client_start_time'] = request.form['start_time']
+    session['client_end_time'] = request.form['end_time']
+    session['end_time'] = int(round(time.time() * 1000000000)) // 1000000
     
     try: 
         completed_qs = session['completed_qs'].split(',')
@@ -135,7 +147,7 @@ def run_questions_page():
             results = session['results']
             automerge_list = session['automerge_list']
             for i,r in enumerate(results):
-                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, speed_rating, adapted, start_time, end_time, education, automerge_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['speed_rating'],r['adapted'],r['start_time'], r['end_time'], session['education_level'], automerge_list[i]))
+                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, speed_rating, adapted, start_time, end_time, client_start_time, client_end_time, education, automerge_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['speed_rating'],r['adapted'],r['start_time'], r['end_time'], r['client_start_time'],r['client_end_time'],session['education_level'], automerge_list[i]))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -148,9 +160,9 @@ def run_questions_page():
             break
         found_n = False
         while not found_n:
-            print("finding questions")
+
             n = random.randint(0,len(question_answers)-1)
-            print(n)
+
             if not str(n) in completed_qs+current_qs:
                 found_n = True
         
@@ -181,14 +193,13 @@ def run_questions_page():
         found_delay = True
         delay = current_delay
     while not found_delay:
-        print("finding delay")
         delay = delay_options[random.randint(0,len(delay_options)-1)]
         if not (str(delay) in completed_delays):
             found_delay=True
             session['current_delay'] = delay
             current_delay = delay
    
-    
+    session['start_time']=int(round(time.time() * 1000000000)) // 1000000
     return render_template('index.html', delay=delay, qas=qas, debug=app.debug, current_task_num=current_task_num+1)
 
 @app.route('/', methods=['GET', 'POST'])
@@ -279,8 +290,7 @@ def run_education_page():
         education = d.get('education_level')
         #need to save edutation here...
         session['education_level'] = education
-        print(education)
-        print('dklskdnsdkfnldf')
+
         session['education'] = True
         return redirect('/')
     return render_template('education.html', debug=app.debug)
@@ -289,11 +299,10 @@ def run_education_page():
 def run_consent_page():
     if request.method == 'POST':
         d = request.form
-        print(d)
-        print(d.get('1'))
+
         consent = d.get('1') and d.get('2') and d.get('3')
         consent = consent and d.get('4') and d.get('5') and d.get('6')
-        print(consent)
+
         session['consent'] = consent
         return redirect('/')
         

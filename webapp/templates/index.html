@@ -4,6 +4,11 @@
 {% block content %}
 <script>
   const delayParam={{delay}};
+
+  function formSubmit(){
+      document.getElementById('end_time').value = Date.now();
+      document.getElementById('questions_form').submit()
+  }
   </script>
    <div class="container">
      <body>
@@ -32,8 +37,9 @@
        <form action="/" id="questions_form" method='POST'>
 	 <input type="hidden" name="delay" value="{{ delay }}"/>
 	 <input type="hidden" id='start_time' name='start_time' value=''/>
+	 <input type="hidden" id='end_time' name='end_time' value=''/>
 	 <input type="hidden" id='automerge_data' name='automerge_data' value=''/>
-	 <button class="btn btn-primary" id="submit_button">Submit</button>
+	 <button class="btn btn-primary" id="submit_button" onclick=formSubmit()>Submit</button>
        </form>
 {% if debug %}
   <button class="btn" id="start">Start</button>

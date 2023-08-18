@@ -50,7 +50,8 @@ const updateValue = async (strings = letters, word = [], id) => {
 		return
 	    }
 	    
-	    const pick = getRandomInt(strings.length)
+	    const pick = 0 //getRandomInt(strings.length)
+	    //changed this
 	    word = strings[pick]
 	    strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
 	    id = letters.indexOf(word)
@@ -66,17 +67,17 @@ const updateValue = async (strings = letters, word = [], id) => {
 	typingDelayParam+=30
     }
     setTimeout(() => {
-
+	var tmp;
 	// Check if current value is a substring of end value
 	if (!(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
 	    console.log("CONFLICT");
 	    console.log(letters[id].join(''))
 	    console.log(sdoc.q[id].toString())
 	    // Theres a conflict, wait x seconds for the user to fix the box
-	   
+	    tmp = sdoc.q[id].toString().trim()
 setTimeout(() => {
-	    // Check if the conflict is resolved...
-    if((letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
+	    // Check if the user is typing...
+    if(!(tmp==sdoc.q[id].toString().trim())){//(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
 		// Conflict fixed, mark this word as finished and move to next
 		// This should all the fun with blank word and cause it to pick a new one
 		// Then return to stop this word completing...
@@ -104,7 +105,7 @@ setTimeout(() => {
 		return
 	    }
 	    
-},10000)
+},3000)
 	   return
 	}
 
@@ -147,7 +148,7 @@ for (var i=0; i<numQuestions;i++){
 			       // Participants has typed, add a token or the script
 			       userTokens+=1;
 			       if (userTokens>10){
-				   typingDelayParam-=30
+				   typingDelayParam-=5
 				   console.log("increased")
 			       }
 			       // Add leter to crdt

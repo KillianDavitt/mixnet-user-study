@@ -37,3 +37,24 @@ for pid in prolific_ids:
 dt = [[x[2],x[5],x[8],x[11],x[14],x[17],x[20],x[23],x[26],x[29]] for [x] in grouped_results]
 for item in dt:
     print(item)
+
+from scipy import stats
+
+# 2000
+group1 = [x[7]-x[6] for x in result_list if x[3]==1000]
+
+#3000
+group2 = [x[7]-x[6] for x in result_list if x[3]==3000]
+#4000
+
+group3 = [x[7]-x[6] for x in result_list if x[3]==5000]
+
+group4 = [x[7]-x[6] for x in result_list if x[3]==7000]
+
+group5 = [x[7]-x[6] for x in result_list if x[3]==0]
+#perform Friedman Test
+print(len(group1))
+print(len(group2))
+print(len(group3))
+x = stats.friedmanchisquare(group5,group1, group2, group3, group4)
+print(x)

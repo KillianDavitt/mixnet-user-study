@@ -75,38 +75,38 @@ const updateValue = async (strings = letters, word = [], id) => {
 	    console.log(sdoc.q[id].toString())
 	    // Theres a conflict, wait x seconds for the user to fix the box
 	    tmp = sdoc.q[id].toString().trim()
-setTimeout(() => {
+	    setTimeout(() => {
 	    // Check if the user is typing...
-    if(!(tmp==sdoc.q[id].toString().trim())){//(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
+	//	if(!(tmp==sdoc.q[id].toString().trim())){//(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
 		// Conflict fixed, mark this word as finished and move to next
 		// This should all the fun with blank word and cause it to pick a new one
 		// Then return to stop this word completing...
-		updateValue(strings, '', id)
-		return
-	    } else {
-		// Conflict still exists, user must have backed off
-		// Delete contents of box and start typing again.
-		let networkDelay = poissonProcess.sample(delayParam)
-		sdoc = Automerge.change(sdoc, 'delete and start again', doc => {
-		    var l=doc.q[id].length;
-		    var j=0;
-		    while(j<i){
-			doc.q[id].deleteAt(0);
-			j++;
-		    }
-		})
-		setTimeout(() => {
-		    pdoc = Automerge.merge(pdoc, sdoc)
-		    sdoc = Automerge.merge(sdoc,pdoc)
-		    input.value = pdoc.q[id]
+		    updateValue(strings, '', id)
+		    return
+	/*	} else {
+		    // Conflict still exists, user must have backed off
+		    // Delete contents of box and start typing again.
+		    let networkDelay = poissonProcess.sample(delayParam)
+		    sdoc = Automerge.change(sdoc, 'delete and start again', doc => {
+			var l=doc.q[id].length;
+			var j=0;
+			while(j<i){
+			    doc.q[id].deleteAt(0);
+			    j++;
+			}
+		    })
+		    setTimeout(() => {
+			pdoc = Automerge.merge(pdoc, sdoc)
+			sdoc = Automerge.merge(sdoc,pdoc)
+			input.value = pdoc.q[id]
 
-		}, networkDelay)
-		updateValue(strings, letters[id], id)
-		return
-	    }
-	    
-},3000)
-	   return
+		    }, networkDelay)
+		    updateValue(strings, letters[id], id)
+		    return 
+		}
+	  */  
+	    },3000)
+	    return
 	}
 
 	updateValue(strings, rest, id)

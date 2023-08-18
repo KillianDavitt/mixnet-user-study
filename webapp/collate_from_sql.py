@@ -29,7 +29,11 @@ grouped_results = []
 # id|created|prolific_id|delay|review|rating|start_time|end_time|education|automerge_data|speed_rating|adapted
 for pid in prolific_ids:
     res = [x for x in result_list if x[2]==pid]
+    res = sorted(res, key= lambda x: x[3])
     grouped_results.append(collate(res[0],res[1],res[2],res[3],res[4]))
 
 
-print(grouped_results[0])
+# Print delay with time
+dt = [[x[2],x[5],x[8],x[11],x[14],x[17],x[20],x[23],x[26],x[29]] for [x] in grouped_results]
+for item in dt:
+    print(item)

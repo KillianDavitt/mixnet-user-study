@@ -75,7 +75,7 @@ const updateValue = async (strings = letters, word = [], id) => {
 	    console.log(sdoc.q[id].toString())
 	    // Theres a conflict, wait x seconds for the user to fix the box
 	    tmp = sdoc.q[id].toString().trim()
-	    setTimeout(() => {
+	    //setTimeout(() => {
 	    // Check if the user is typing...
 	//	if(!(tmp==sdoc.q[id].toString().trim())){//(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
 		// Conflict fixed, mark this word as finished and move to next
@@ -105,7 +105,7 @@ const updateValue = async (strings = letters, word = [], id) => {
 		    return 
 		}
 	  */  
-	    },3000)
+	  //  },3000)//
 	    return
 	}
 

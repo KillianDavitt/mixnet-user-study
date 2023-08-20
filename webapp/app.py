@@ -151,6 +151,9 @@ def run_questions_page():
             conn.close()
         except Exception as e:
             print(e)
+            with open('errors.txt','a') as f:
+                f.write(str(session['results']))
+
             return "There was an error in savings your results to the database. Please contact the survey administrator."
         return render_template('end.html', debug=app.debug)
 

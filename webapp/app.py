@@ -21,7 +21,6 @@ delay_options = [250,500,1000,2000,4000]
 def wasm_file():
     return send_file('static/c129ad2439821907f5fd.module.wasm', mimetype = 'application/wasm');
 
-
 def get_db_connection():
     conn = sqlite3.connect('db.sqlite')
     conn.row_factory = sqlite3.Row
@@ -193,7 +192,11 @@ def run_questions_page():
         found_delay = True
         delay = current_delay
     while not found_delay:
-        delay = delay_options[random.randint(0,len(delay_options)-1)]
+        if len(completed_delays)==0:
+            # conduct practice
+            delay = 250
+        else:
+            delay = delay_options[random.randint(0,len(delay_options)-1)]
         if not (str(delay) in completed_delays):
             found_delay=True
             session['current_delay'] = delay

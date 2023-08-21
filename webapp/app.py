@@ -15,7 +15,7 @@ SESSION_TYPE = 'filesystem'
 secret_key= "fhdsfjd"
 app.config.from_object(__name__)
 Session(app)
-delay_options = [250,500,1000,2000,4000]
+delay_options = [5,250,500,1000,2000,4000]
 
 @app.route('/c129ad2439821907f5fd.module.wasm')
 def wasm_file():
@@ -146,7 +146,7 @@ def run_questions_page():
             results = session['results']
             automerge_list = session['automerge_list']
             for i,r in enumerate(results):
-                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, speed_rating, adapted, start_time, end_time, client_start_time, client_end_time, education, automerge_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['speed_rating'],r['adapted'],r['start_time'], r['end_time'], r['client_start_time'],r['client_end_time'],session['education_level'], automerge_list[i]))
+                conn.execute('INSERT INTO response (prolific_id, delay, review, rating, speed_rating, adapted, start_time, end_time, client_start_time, client_end_time, education, automerge_data, completed_delays) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (session['prolific_id'], r['delay'], r['review'], r['rating'], r['speed_rating'],r['adapted'],r['start_time'], r['end_time'], r['client_start_time'],r['client_end_time'],session['education_level'], automerge_list[i], str(session['completed_delays'])))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -197,6 +197,8 @@ def run_questions_page():
     while not found_delay:
         if len(completed_delays)==0:
             # conduct practice
+            delay = 5
+        elif (len(completed_delays))==1:
             delay = 250
         else:
             delay = delay_options[random.randint(0,len(delay_options)-1)]

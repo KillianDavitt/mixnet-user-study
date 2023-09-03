@@ -209,7 +209,9 @@ document.getElementById("submit_button").addEventListener("click", function (eve
     });
 
 if (delayParam != 0) {
-updateValue()
+     setTimeout(() => {
+	 updateValue()
+     },500)
 }
 
 function saveAutomergeData(){

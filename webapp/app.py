@@ -15,7 +15,7 @@ SESSION_TYPE = 'filesystem'
 secret_key= "fhdsfjd"
 app.config.from_object(__name__)
 Session(app)
-delay_options = [5,250,500,1000,2000,4000]
+delay_options = [5,250,500,5000,10000,15000]
 
 @app.route('/c129ad2439821907f5fd.module.wasm')
 def wasm_file():

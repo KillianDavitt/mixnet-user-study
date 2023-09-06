@@ -115,3 +115,21 @@ Also if i'm making sure that 5 different times are significantly different to ea
 potentially: 58 people, for 5 different latencies
 
 do a friedman test and a games howell
+* Age brackets
+
+prolific age brackets
+#####
+18-27, 28-37, 38-47, 48-57, and 58+.
+
+18-29, 30-39, 40-49,50-64,65+
+8.3+6.5,7+6.7,6.3+6.4,6.9+6.8+5.8, 4.9+5+3.6+2.5+2.4
+
+14.8, 13.7, 12.7, 19.5, 18.4
+
+
+
+https://www.ethnicity-facts-figures.service.gov.uk/uk-population-by-ethnicity/demographics/age-groups/latest
+
+
+* statistical testing
+https://aaronschlegel.me/games-howell-post-hoc-multiple-comparisons-test-python.html

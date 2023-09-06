@@ -50,7 +50,7 @@ const updateValue = async (strings = letters, word = [], id) => {
 		return
 	    }
 	    
-	    const pick = 0 //getRandomInt(strings.length)
+	    const pick = getRandomInt(strings.length)
 	    //changed this
 	    word = strings[pick]
 	    strings = [...strings.slice(0,pick),...strings.slice(pick+1)]

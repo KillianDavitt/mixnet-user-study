@@ -8,6 +8,8 @@ let userTokens = 6;
 const numQuestions = 14
 var typingDelayParam = 700
 
+var numVisible = 4
+
 pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {
     pdoc.q=Array(numQuestions).fill(new Automerge.Text(""))
 })
@@ -49,13 +51,12 @@ const updateValue = async (strings = letters, word = [], id) => {
 	    if (strings.length === 0) {
 		return
 	    }
-	    
 	    const pick = getRandomInt(strings.length)
 	    //changed this
 	    word = strings[pick]
 	    strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
 	    id = letters.indexOf(word)
-	} while (sdoc.q[id].toString()!="")
+	} while (sdoc.q[id].toString()!="" || id>numVisible)
     }
     
     const input = document.getElementById(`answer${id}`)
@@ -221,3 +222,46 @@ function saveAutomergeData(){
     
     return
 }
+
+function revealQuestion(classn){
+    var elems = document.getElementsByClassName(classn)
+    for(var i=0; i<elems.length; i++){ 
+	elems[i].style.opacity = '100';
+    }
+}
+
+async function scanQuestions(){
+    while (true) {
+    // are the previous questions full
+	var done = false
+	var elems = document.getElementsByClassName('qinputs');
+	for(var i=0; i<numVisible; i++){
+	    console.log("checking")
+	    if(elems[i].value==''){
+		console.log("not all full")
+		done=true
+		break
+	    }
+	}
+	// if yes make the next 2 visible
+	if(done==false){
+	    console.log("making more visible")
+	    for(var i=numVisible; i<numVisible+2; i++){
+		console.log("revealing: " + elems[i].id)
+		revealQuestion(elems[i].parentElement.className)
+	    }
+	    numVisible+=2
+	    if(numVisible>=numQuestions){
+		document.getElementById('submit_button').style.opacity = '100';
+	    }
+	}
+
+	// if no, wait 5 seconds
+	if(done==true){
+	    console.log("not done yet")
+	    await myDelay(1000)
+	}
+    }
+}
+
+scanQuestions()

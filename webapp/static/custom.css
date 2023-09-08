@@ -2,3 +2,7 @@
 
     border-color: #000000;
 }
+#fade {
+  opacity: 1;
+  transition: 3s opacity;
+}

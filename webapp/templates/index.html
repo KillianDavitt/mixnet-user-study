@@ -15,18 +15,31 @@
        <br><br>
        <h2>Please fill out these questions</h2>
 
-       This is task {{ current_task_num }} of 6. 
+       This is task {{ current_task_num }} of 6.
+
+       More questions will slowly appear as you answer the questions.
        
        <br><br>
        {% for question in qas %}
        <div class="row">
 	 <div class="col-1"></div>
-	   <div class="col-5">
-	      {{ question[0] }}
+	 <div class="col-5">
+	   {% if loop.index>4 %}
+	   <div class="d{{ loop.index }} fade" style="opacity:0">
+	     {% else %}
+	     <div class="d{{ loop.index }}">
+	     {% endif %}
+	     {{ question[0] }}
 	     </div>
-	     <div class="col-5">
-        <input type="text" id="answer{{ loop.index-1 }}" num={{ loop.index-1 }} answer="{{ question[1] }}"/>
-	</div>
+	     </div>
+	   <div class="col-5">
+	     {% if loop.index>4 %}
+	   <div class="d{{ loop.index }} fade" style="opacity:0">
+	     {% else %}
+	     <div class="d{{ loop.index }}">
+	     {% endif %}
+        <input type="text" class="qinputs" id="answer{{ loop.index-1 }}" num={{ loop.index-1 }} answer="{{ question[1] }}"/>
+	</div></div>
 	<div class="col-3">
 	  </div>
 </div>
@@ -39,7 +52,7 @@
 	 <input type="hidden" id='start_time' name='start_time' value=''/>
 	 <input type="hidden" id='end_time' name='end_time' value=''/>
 	 <input type="hidden" id='automerge_data' name='automerge_data' value=''/>
-	 <button class="btn btn-primary" id="submit_button" onclick=formSubmit()>Submit</button>
+	 <button class="btn btn-primary" id="submit_button" style="opacity:0" onclick=formSubmit()>Submit</button>
        </form>
 {% if debug %}
   <button class="btn" id="start">Start</button>

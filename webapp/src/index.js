@@ -46,17 +46,18 @@ const updateValue = async (strings = letters, word = [], id) => {
 
     // If exhausted current word, select a new word
     if (word.length == 0) {
-	
+	var pick = 0;
 	do {
+	    await myDelay(500)
 	    if (strings.length === 0) {
 		return
 	    }
-	    const pick = getRandomInt(strings.length)
+	    pick = getRandomInt(strings.length)
 	    //changed this
 	    word = strings[pick]
-	    strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
 	    id = letters.indexOf(word)
-	} while (sdoc.q[id].toString()!="" || id>numVisible)
+	} while (sdoc.q[id].toString()!="" || id>=numVisible)
+	strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
     }
     
     const input = document.getElementById(`answer${id}`)
@@ -64,16 +65,13 @@ const updateValue = async (strings = letters, word = [], id) => {
 
     while (userTokens<1) {
 	await myDelay(2000)
-	console.log("reduced")
+	//console.log("reduced")
 	typingDelayParam+=30
     }
     setTimeout(() => {
 	var tmp;
 	// Check if current value is a substring of end value
 	if (!(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
-	    console.log("CONFLICT");
-	    console.log(letters[id].join(''))
-	    console.log(sdoc.q[id].toString())
 	    // Theres a conflict, wait x seconds for the user to fix the box
 	    tmp = sdoc.q[id].toString().trim()
 	    //setTimeout(() => {
@@ -150,7 +148,7 @@ for (var i=0; i<numQuestions;i++){
 			       userTokens+=1;
 			       if (userTokens>10){
 				   typingDelayParam-=5
-				   console.log("increased")
+				   //console.log("increased")
 			       }
 			       // Add leter to crdt
 			       pdoc = Automerge.change(pdoc, 'Add letter', doc => {
@@ -236,30 +234,31 @@ async function scanQuestions(){
 	var done = false
 	var elems = document.getElementsByClassName('qinputs');
 	for(var i=0; i<numVisible; i++){
-	    console.log("checking")
 	    if(elems[i].value==''){
-		console.log("not all full")
+		
 		done=true
 		break
 	    }
 	}
 	// if yes make the next 2 visible
 	if(done==false){
-	    console.log("making more visible")
-	    for(var i=numVisible; i<numVisible+2; i++){
-		console.log("revealing: " + elems[i].id)
+	    
+	    for(var i=numVisible; i<numVisible+2 && i<numQuestions; i++){
+		//console.log("revealing: " + elems[i].id)
 		revealQuestion(elems[i].parentElement.className)
 	    }
-	    numVisible+=2
+
 	    if(numVisible>=numQuestions){
 		document.getElementById('submit_button').style.opacity = '100';
+		return
+	    } else{
+		numVisible+=2
 	    }
 	}
 
 	// if no, wait 5 seconds
 	if(done==true){
-	    console.log("not done yet")
-	    await myDelay(1000)
+	    await myDelay(2000)
 	}
     }
 }

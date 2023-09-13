@@ -5,10 +5,10 @@ let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
 let userTokens = 6;
 
-const numQuestions = 14
+const numQuestions = 15
 var typingDelayParam = 700
 
-var numVisible = 4
+var numVisible = 3
 
 pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {
     pdoc.q=Array(numQuestions).fill(new Automerge.Text(""))

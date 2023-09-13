@@ -5,8 +5,8 @@ import random
 import sqlite3
 import time
 
-num_questions = 14
-start_questions = 4
+num_questions = 15
+start_questions = 3
 
 app = Flask(__name__,static_url_path='', 
             static_folder='static',

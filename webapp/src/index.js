@@ -243,7 +243,7 @@ async function scanQuestions(){
 	// if yes make the next 2 visible
 	if(done==false){
 	    
-	    for(var i=numVisible; i<numVisible+2 && i<numQuestions; i++){
+	    for(var i=numVisible; i<numVisible+3 && i<numQuestions; i++){
 		//console.log("revealing: " + elems[i].id)
 		revealQuestion(elems[i].parentElement.className)
 	    }

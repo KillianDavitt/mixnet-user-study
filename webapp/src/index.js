@@ -252,7 +252,7 @@ async function scanQuestions(){
 		document.getElementById('submit_button').style.opacity = '100';
 		return
 	    } else{
-		numVisible+=2
+		numVisible+=3
 	    }
 	}
 

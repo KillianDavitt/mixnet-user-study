@@ -210,7 +210,7 @@ document.getElementById("submit_button").addEventListener("click", function (eve
 if (delayParam != 0) {
      setTimeout(() => {
 	 updateValue()
-     },500)
+     },250)
 }
 
 function saveAutomergeData(){
@@ -243,7 +243,7 @@ async function scanQuestions(){
 	// if yes make the next 2 visible
 	if(done==false){
 	    
-	    for(var i=numVisible; i<numVisible+3 && i<numQuestions; i++){
+	    for(var i=numVisible; i<numVisible+2 && i<numQuestions; i++){
 		//console.log("revealing: " + elems[i].id)
 		revealQuestion(elems[i].parentElement.className)
 	    }
@@ -258,7 +258,7 @@ async function scanQuestions(){
 
 	// if no, wait 5 seconds
 	if(done==true){
-	    await myDelay(2000)
+	    await myDelay(1000)
 	}
     }
 }

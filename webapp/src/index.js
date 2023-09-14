@@ -5,10 +5,10 @@ let pdoc = Automerge.init()
 let sdoc = Automerge.clone(pdoc)
 let userTokens = 6;
 
-const numQuestions = 15
+const numQuestions = 14
 var typingDelayParam = 700
 
-var numVisible = 3
+var numVisible = 2
 
 pdoc = Automerge.change(pdoc, 'Create textboxes', pdoc => {
     pdoc.q=Array(numQuestions).fill(new Automerge.Text(""))
@@ -252,7 +252,7 @@ async function scanQuestions(){
 		document.getElementById('submit_button').style.opacity = '100';
 		return
 	    } else{
-		numVisible+=3
+		numVisible+=2
 	    }
 	}
 

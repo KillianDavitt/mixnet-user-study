@@ -48,7 +48,7 @@ const updateValue = async (strings = letters, word = [], id) => {
     if (word.length == 0) {
 	var pick = 0;
 	do {
-	    await myDelay(500)
+	    await myDelay(200)
 	    if (strings.length === 0) {
 		return
 	    }

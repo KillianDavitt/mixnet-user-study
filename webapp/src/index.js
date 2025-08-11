@@ -53,9 +53,10 @@ const updateValue = async (strings = letters, word = [], id) => {
 		return
 	    }
 	    pick = getRandomInt(strings.length)
-	    //changed this
+	    
 	    word = strings[pick]
 	    id = letters.indexOf(word)
+	 // Keep trying to get a new word until the id is in the visible range.   
 	} while (sdoc.q[id].toString()!="" || id>=numVisible)
 	strings = [...strings.slice(0,pick),...strings.slice(pick+1)]
     }
@@ -63,48 +64,18 @@ const updateValue = async (strings = letters, word = [], id) => {
     const input = document.getElementById(`answer${id}`)
     const [letter,...rest] = word
 
+    // If the participant has no token, reduce the simUsers typing speed
     while (userTokens<1) {
 	await myDelay(2000)
-	//console.log("reduced")
 	typingDelayParam+=30
     }
     setTimeout(() => {
 	var tmp;
 	// Check if current value is a substring of end value
 	if (!(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
-	    // Theres a conflict, wait x seconds for the user to fix the box
 	    tmp = sdoc.q[id].toString().trim()
-	    //setTimeout(() => {
-	    // Check if the user is typing...
-	//	if(!(tmp==sdoc.q[id].toString().trim())){//(letters[id].join('').trim().includes(sdoc.q[id].toString().trim()))){
-		// Conflict fixed, mark this word as finished and move to next
-		// This should all the fun with blank word and cause it to pick a new one
-		// Then return to stop this word completing...
-		    updateValue(strings, '', id)
-		    return
-	/*	} else {
-		    // Conflict still exists, user must have backed off
-		    // Delete contents of box and start typing again.
-		    let networkDelay = poissonProcess.sample(delayParam)
-		    sdoc = Automerge.change(sdoc, 'delete and start again', doc => {
-			var l=doc.q[id].length;
-			var j=0;
-			while(j<i){
-			    doc.q[id].deleteAt(0);
-			    j++;
-			}
-		    })
-		    setTimeout(() => {
-			pdoc = Automerge.merge(pdoc, sdoc)
-			sdoc = Automerge.merge(sdoc,pdoc)
-			input.value = pdoc.q[id]
-
-		    }, networkDelay)
-		    updateValue(strings, letters[id], id)
-		    return 
-		}
-	  */  
-	  //  },3000)//
+	    updateValue(strings, '', id)
+	    return
 	    return
 	}
 
@@ -144,12 +115,12 @@ for (var i=0; i<numQuestions;i++){
     typeInput.addEventListener( "input" ,
 			   (e) => {
 
-			       // Participants has typed, add a token or the script
+			       // Participants has typed, add a token
 			       userTokens+=1;
 			       if (userTokens>10){
 				   typingDelayParam-=5
-				   //console.log("increased")
 			       }
+			       
 			       // Add leter to crdt
 			       pdoc = Automerge.change(pdoc, 'Add letter', doc => {
 				   var num = e.target.getAttribute('num')
@@ -180,11 +151,12 @@ for (var i=0; i<numQuestions;i++){
 
 let startInput = document.querySelector("#start")
 if (startInput){
-startInput.onclick = (ev) => {
-  ev.preventDefault()
-    updateValue()
+    startInput.onclick = (ev) => {
+	ev.preventDefault()
+	updateValue()
+    }
 }
-}
+
 function clearAll(){
     for (var i=0; i<answers.length;i++){
 	document.getElementById(`answer${i}`).value='';
@@ -193,10 +165,10 @@ function clearAll(){
 
 let clearInput = document.querySelector("#clear")
 if (clearInput){
-clearInput.onclick = (ev) => {
-  ev.preventDefault()
-    clearAll()
-}
+    clearInput.onclick = (ev) => {
+	ev.preventDefault()
+	clearAll()
+    }
 }
 
 
@@ -230,16 +202,16 @@ function revealQuestion(classn){
 
 async function scanQuestions(){
     while (true) {
-    // are the previous questions full
+	// are the previous questions full
 	var done = false
 	var elems = document.getElementsByClassName('qinputs');
 	for(var i=0; i<numVisible; i++){
-	    if(elems[i].value==''){
-		
+	    if(elems[i].value==''){	
 		done=true
 		break
 	    }
 	}
+	
 	// if yes make the next 2 visible
 	if(done==false){
 	    

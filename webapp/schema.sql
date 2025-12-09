@@ -12,5 +12,5 @@ CREATE TABLE response (
     education VARCHAR(50), 
     automerge_data VARCHAR(100000), 
     speed_rating uint, 
-    adapted bool);
-CREATE TABLE sqlite_sequence(name,seq);
+    adapted bool,
+    completed_delays VARCHAR(100));

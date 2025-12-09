@@ -6,6 +6,7 @@ import sqlite3
 import time
 
 num_questions = 14
+num_sessions = 1
 start_questions = 2
 
 app = Flask(__name__,static_url_path='', 
@@ -16,7 +17,7 @@ SESSION_TYPE = 'filesystem'
 secret_key= "fhdsfjd"
 app.config.from_object(__name__)
 Session(app)
-delay_options = [5,250,500,2500,5000,7500]
+delay_options = [5, 5, 1000, 5000, 7000, 10000]
 
 @app.route('/c129ad2439821907f5fd.module.wasm')
 def wasm_file():
@@ -33,11 +34,10 @@ with open('questions.csv') as f:
 question_answers = [x.strip().split(',') for x in data]
 
 def run_survey_page():
-    #session['prolific_id'] = -1
+
     if 'filled' in request.form:
-        #print(request.form)
-        # get all the survey.html results and record them
-        #prolific_id = -1
+        
+        # get all the survey.html results and record them       
         try:
                 delay = request.form['delay']
                 rating = request.form['rating']
@@ -91,7 +91,7 @@ def run_survey_page():
 
     session['client_start_time'] = request.form['start_time']
     session['client_end_time'] = request.form['end_time']
-    session['end_time'] = int(round(time.time() * 1000000000)) // 1000000
+    session['end_time'] = int(round(time.time() * 1e9)) // 1000000
     
     try: 
         completed_qs = session['completed_qs'].split(',')
@@ -140,7 +140,7 @@ def run_questions_page():
     current_task_num = int(len(completed_qs)/num_questions)
         
     # Finished all available questions
-    if len(completed_qs) >= len(question_answers):
+    if len(completed_qs) >= num_questions*num_sessions:
         # Time to write everything to the DB
         try:
             conn = get_db_connection()

@@ -90,11 +90,20 @@ docker build -t mixnet-user-study .
 After successfully building the docker image, you can run the image as follows:
 
 ```bash
-docker run mixnet-user-study
+docker run -p 8080:8080 mixnet-user-study
 ```
 
-While this is running you should be able to access the webpage via the link provided by docker.
+While this is running you should be able to access the webpage on port 8080 via the link provided by docker. Please use the Docker provided IP address and not 127.0.0.1.
 
+You can now complete the user study as the study participants did. After completing the study, the results are saved in an sqlite3 database, `db.sqlite'. 
+
+You can check the contents of the response table. The following command is provided as an example showing some of the fields:
+
+```sql
+select prolific_id,delay,review,rating,end_time-start_time,education from response;
+```
+
+This database is then used to generate figures and statistics in experiment 2 (The real database from our user study deployment is provided).
 
 #### Experiment 2: Generating figures and statistics
 
@@ -106,7 +115,11 @@ docker build . --tag 'mixnet-results'
 docker run --rm -v $(pwd)/figures:/figures/ mixnet-results
 ```
 
-Once the commands have been run, please observe the three png figures produced in the figures/ directory.
+Once the commands have been run, please observe the three png images produced in the figures/ directory. These 3 png images correspond to the following 3 figures in the paper:
+
+figure 2: frustration.png
+figure 4: strategy.png
+figure 3: perceived_time_diff.png
 
 ## Limitations (Required for Functional and Reproduced badges)
 

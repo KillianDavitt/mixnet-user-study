@@ -125,9 +125,10 @@ docker run --rm -v $(pwd)/figures:/figures/ mixnet-results
 Once the commands have been run, please observe the three png images produced in the figures/ directory. These 3 png images correspond to the following 3 figures in the paper:
 
 figure 2: frustration.png
-figure 4: strategy.png
+
 figure 3: perceived_time_diff.png
 
+figure 4: strategy.png
 ## Limitations (Required for Functional and Reproduced badges)
 
 The artifact fully reproduces the application used by participants in our study. 

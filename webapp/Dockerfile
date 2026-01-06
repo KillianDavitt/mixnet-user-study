@@ -28,6 +28,6 @@ COPY --from=frontend-build ./static ./static
 RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
 RUN sqlite3 db.sqlite < schema.sql
 
-EXPOSE 5000
+EXPOSE 8080
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]

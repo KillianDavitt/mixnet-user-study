@@ -64,7 +64,14 @@ cd mixnet-user-study
 
 
 ### Testing the Environment (Required for Functional and Reproduced badges)
-N/A
+
+Check if you have docker properly installed
+
+```bash
+docker version
+```
+
+This artifact has been tested with docker version 20.10.24
 
 ## Artifact Evaluation (Required for Functional and Reproduced badges)
 

@@ -1,3 +1,4 @@
+# This script prints the breakdown of education levels for all participants
 import sqlite3
 import sys
 
@@ -13,9 +14,11 @@ groups = set([x[3] for x in result_list])
 groups = sorted(groups)
 groups.remove(5)
 group1 = [x[8] for x in result_list if x[3]==groups[0] and x[8]!=None]
-print(group1)
+test = [x[8] for x in result_list if x[3]==groups[0] and x[8]==None]
+
 levels = sorted(set(group1))
 
+print("Education Levels:")
 lookup = dict({"1":"None", "2":"A levels, gsce", "3":"BA", "4":"postgrad"})
 for l in levels:
     print(lookup[l] + ': ', end='')

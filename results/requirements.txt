@@ -1,6 +1,8 @@
-scipy
-pandas
-matplotlib
-pingouin
-plotly
-kaleido
+scipy==1.16.3
+pandas==2.3.3
+matplotlib==3.10.7
+pingouin==0.5.5
+plotly==6.5.0
+kaleido==1.2.0
+numpy_indexed==0.3.7
+hypothetical==0.3.0

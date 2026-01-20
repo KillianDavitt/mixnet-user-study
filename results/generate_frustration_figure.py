@@ -41,13 +41,6 @@ for g in groups:
     group_options.append(new_options)
     
 
-print(group_options)
-
-for x in group_options:
-    for i in range(4):
-        print(str(x[i]) + ' & ',end='')
-    print('\\\\')
-
 
 
 delays = ["No Assistance", "1", "4", "7",

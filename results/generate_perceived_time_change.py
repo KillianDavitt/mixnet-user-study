@@ -11,7 +11,6 @@ import numpy as np
 import matplotlib
 import matplotlib as mpl
 import seaborn as sns
-
 import re
 def number_shaver(ch,
                   regx = re.compile('(?<![\d.])0*(?:'
@@ -55,7 +54,6 @@ for g in groups:
     
     group_options.append(new_options)
 normalised_data = []
-print(group_options)
 for group in group_options:
     total = sum(group)
     normalised_row = [float(number_shaver(str(round((x/total)*100,1)))) for x in group]
@@ -73,10 +71,8 @@ df = pd.DataFrame(data, columns = ['a','b','c','d','e'])
 df.insert(0,'label',pd.array(['No Assistance',' 1',  ' 4',' 7',' 10'],dtype=str))
 df = df.iloc[::-1]
 
-print(df)
 # Check that the rows add up to 100
 values = df.iloc[:, 1:6].values.tolist()
-print(values)
 #for v in values:
 #    if not sum(v) == 100:
 #        raise ValueError("There is a row that does not add up to 100%.")
@@ -127,14 +123,12 @@ labels = [
 # Add line breaks to questions after fifth word
 questions = []
 qs = df.iloc[:,0].tolist()
-print(qs)
 for q in qs:
     words = q
     #for w in range(1, int(math.ceil((len(words) / 5)))):
     #    words.insert(w * 5, "<br>")
     questions.append(words)
 
-print(questions)
 # The following code was taken and modified from:
 # https://plotly.com/python/horizontal-bar-charts/#color-palette-for-bar-chart
 

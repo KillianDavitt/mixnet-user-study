@@ -97,7 +97,7 @@ docker build -t mixnet-user-study .
 After successfully building the docker image, you can run the image as follows:
 
 ```bash
-docker run -p 8080:8080 mixnet-user-study
+docker run --name mixnet_study -p 8080:8080 mixnet-user-study
 ```
 
 While this is running you should be able to access the webpage on port 8080 via the link provided by docker. Please use the Docker provided IP address and not 127.0.0.1.
@@ -105,6 +105,13 @@ While this is running you should be able to access the webpage on port 8080 via 
 You can now complete the user study as the study participants did. After completing the study, the results are saved in an sqlite3 database, `db.sqlite'. 
 
 You can check the contents of the response table. The following command is provided as an example showing some of the fields:
+
+```bash
+docker exec -it  mixnet_study /bin/bash
+sqlite3 db.sqlite
+```
+
+If you have completed the user study, you will be able to view an example of the results recorded with the following sql command.
 
 ```sql
 select prolific_id,delay,review,rating,end_time-start_time,education from response;
@@ -122,7 +129,15 @@ docker build . --tag 'mixnet-results'
 docker run --rm -v $(pwd)/figures:/figures/ mixnet-results
 ```
 
-Once the commands have been run, please observe the three png images produced in the figures/ directory. These 3 png images correspond to the following 3 figures in the paper:
+Once the commands have been run you will observe a number of statistics printed to the screen. These are as follows: 
+
+1. The Friedman test statistic and p-value. These are included in the paper on section 4.1
+2. The results of the Games-Howell test. This data forms Table 2 in the paper
+3. Cohen's D, which forms the last column of Table 2
+4. Overall mean completion times for each delay level. This forms Table 3 in the paper
+
+
+Next, please observe the three png images produced in the figures/ directory. These 3 png images correspond to the following 3 figures in the paper:
 
 figure 2: frustration.png
 

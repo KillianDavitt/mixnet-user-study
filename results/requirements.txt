@@ -6,3 +6,4 @@ plotly==6.5.0
 kaleido==1.2.0
 numpy_indexed==0.3.7
 hypothetical==0.3.0
+jinja2

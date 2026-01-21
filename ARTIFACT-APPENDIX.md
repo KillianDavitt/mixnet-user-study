@@ -135,6 +135,8 @@ Once the commands have been run you will observe a number of statistics printed 
 2. The results of the Games-Howell test. This data forms Table 2 in the paper
 3. Cohen's D, which forms the last column of Table 2
 4. Overall mean completion times for each delay level. This forms Table 3 in the paper
+5. Games-Howell test and hedges for delay vs frustration Likert scale. This forms Table 4 in the paper.
+6. Games-Howell test and hedges for delay vs perceived speed Likert scale. This forms Table 5 in the paper.
 
 
 Next, please observe the three png images produced in the figures/ directory. These 3 png images correspond to the following 3 figures in the paper:

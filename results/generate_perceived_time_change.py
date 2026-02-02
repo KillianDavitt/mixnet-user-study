@@ -1,253 +1,186 @@
-# This script analyses the Likert question for "Perceived time change", i.e. "what effect did the second user have on how long it felt to complete the task"
-import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
-import math
-
-import sqlite3
+import os
 import sys
-import matplotlib.pyplot as plt
+import sqlite3
+from typing import List, Tuple, Dict, Any
 import numpy as np
-import matplotlib
-import matplotlib as mpl
-import seaborn as sns
-import re
-def number_shaver(ch,
-                  regx = re.compile('(?<![\d.])0*(?:'
-                                    '(\d+)\.?|\.(0)'
-                                    '|(\.\d+?)|(\d+\.\d+?)'
-                                    ')0*(?![\d.])')  ,
-                  repl = lambda mat: mat.group(mat.lastindex)
-                                     if mat.lastindex!=3
-                                     else '0' + mat.group(3) ):
-    return regx.sub(repl,ch)
+import pandas as pd
+import plotly.graph_objects as go
 
-conn = sqlite3.connect(sys.argv[1])
-cur = conn.cursor()
-row_results = cur.execute("SELECT * FROM response;").fetchall()
+IDX_GROUP = 3          # x[3]  group/condition id
+IDX_PARTICIPANT = 5
+IDX_LIKERT = 10        # x[10] perceived time change response
 
+LIKERT_LEVELS = list(range(1, 5 + 1))
 
-result_list = [list(x) for x in row_results]
+EXCLUDE_GROUP_ID = 5
 
-groups = set([x[3] for x in result_list])
-groups = sorted(groups)
-groups.remove(5)
-g1 = [(x[5],x[10]) for x in result_list if x[3]==groups[0]]
+GROUP_LABELS: Dict[Any, str] = {
+     0: "No Assistance",
+     1000: "1",
+     4000: "4",
+     7000: "7",
+     10000: "10",
+}
 
-g2 = [(x[5],x[10]) for x in result_list if x[3]==groups[1]]
-
-g3 = [(x[5],x[10]) for x in result_list if x[3]==groups[2]]
-
-g4 = [(x[5],x[10]) for x in result_list if x[3]==groups[3]]
-g5 = [(x[5],x[10]) for x in result_list if x[3]==groups[4]]
-
-groups= [g1,g2,g3,g4,g5]
-
-options = [0,0,0,0,0]
-
-options = [0,0,0,0,0]
-group_options = []
-for g in groups:
-    new_options = options.copy()
-    for x in g:
-        new_options[x[1]-1]+=1
-    
-    group_options.append(new_options)
-normalised_data = []
-for group in group_options:
-    total = sum(group)
-    normalised_row = [float(number_shaver(str(round((x/total)*100,1)))) for x in group]
-    normalised_data.append(normalised_row)
-
-
-
-data = np.array(normalised_data)
-
-
-
-# Upload your data as a CSV and load as a DataFrame
-df = pd.DataFrame(data, columns = ['a','b','c','d','e'])
-#df = df[df.columns[::-1]]
-df.insert(0,'label',pd.array(['No Assistance',' 1',  ' 4',' 7',' 10'],dtype=str))
-df = df.iloc[::-1]
-
-# Check that the rows add up to 100
-values = df.iloc[:, 1:6].values.tolist()
-#for v in values:
-#    if not sum(v) == 100:
-#        raise ValueError("There is a row that does not add up to 100%.")
-
-# ----------------------------------------------#
-# Fill out steps 1-4 to customize your diagram: #
-# ----------------------------------------------#
-
-# 1. Set title text 
-title = ""
-
-# 2. (Optional) Set width and height
-width = 1100
-height = 500
-
-# 3. (Optional) Set colors for the...
-background_color = "#FFFFFF" # Background
-colors = [
-   "#de425b",  # Strongly Disagree bars
-    "#ea936d",  # Disagree bar
-   
-    "#fbdbb1",  # "Neutral" bars
-
-    
-    "#b2b264",  # "Agree" bars
-      "#488f31",  # "Strongly Agree" bars
+BACKGROUND_COLOR = "#FFFFFF"
+COLORS = [
+    "#de425b",  # Much Slower
+    "#ea936d",  # Slightly Slower
+    "#fbdbb1",  # Neutral
+    "#b2b264",  # Slightly Quicker
+    "#488f31",  # Much Quicker
+]
+LIKERT_LABELS = [
+    "<b>Much<br>Slower</b>",
+    "<b>Slightly Slower</b>",
+    "<b>Neutral</b>",
+    "<b>Slightly Quicker</b>",
+    "<b>Much<br>Quicker</b>",
 ]
 
-# 4. (Optional) Customize font settings of plot annontations
-title_font = dict(family="Helvetica", size=20, color="black")
-questions_font = dict(family="Helvetica", size=14, color="black")
-likert_scale_font = dict(family="Helvetica", size=14, color="black")
-percent_font = dict(family="Helvetica", size=16, color="#434343")
+def fetch_rows(db_path):
+    conn = sqlite3.connect(db_path)
+    try:
+        cur = conn.cursor()
+        rows = cur.execute(f"SELECT * FROM response;").fetchall()
+        return rows
+    finally:
+        conn.close()
 
-# ------------------------------------------#
-# Code to create stacked bar chart begins!  #
-# ------------------------------------------#
+def compute_group_percentages(rows):
+    group_ids = sorted({r[IDX_GROUP] for r in rows if r is not None})
 
-# Define Likert scale labels with formatting
-labels = [
-    "<b>Much<br>Slower<b>",
-    "<b>Slightly Slower<b>",
-    "<b>Neutral<b>",
-    "<b>Slightly Quicker<b>",
-    "<b>Much<br>Quicker<b>",
-]
+    if EXCLUDE_GROUP_ID is not None:
+        group_ids = [g for g in group_ids if g != EXCLUDE_GROUP_ID]
 
-# Add line breaks to questions after fifth word
-questions = []
-qs = df.iloc[:,0].tolist()
-for q in qs:
-    words = q
-    #for w in range(1, int(math.ceil((len(words) / 5)))):
-    #    words.insert(w * 5, "<br>")
-    questions.append(words)
+    counts = np.zeros((len(group_ids), len(LIKERT_LEVELS)), dtype=int)
 
-# The following code was taken and modified from:
-# https://plotly.com/python/horizontal-bar-charts/#color-palette-for-bar-chart
+    group_index = {g: i for i, g in enumerate(group_ids)}
 
-# Create a Plotly Graph object
-fig = go.Figure()
+    for r in rows:
+        g = r[IDX_GROUP]
+        if EXCLUDE_GROUP_ID is not None and g == EXCLUDE_GROUP_ID:
+            continue
+        if g not in group_index:
+            continue
 
-# Create a bar for each question and label with the correct color
-for i in range(0, len(values[0])):
-    for xd, yd in zip(values, questions):
+        likert = int((r[IDX_LIKERT]))
+        if likert is None or not (1 <= likert <= 5):
+            continue
+
+        counts[group_index[g], likert - 1] += 1
+
+    totals = counts.sum(axis=1, keepdims=True)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        perc = np.where(totals == 0, 0.0, counts / totals * 100.0)
+
+    perc = np.round(perc, 1)
+
+    return group_ids, perc
+
+def build_dataframe(group_ids, perc):
+    df = pd.DataFrame(perc, columns=["a", "b", "c", "d", "e"])
+    labels = [GROUP_LABELS.get(g, str(g)) for g in group_ids]
+    df.insert(0, "label", labels)
+    return df
+
+def plot_likert_stacked(df, out_path):
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+
+    questions = df["label"].astype(str).tolist()
+    vals = df[["a", "b", "c", "d", "e"]].to_numpy(dtype=float)
+    row_sums = vals.sum(axis=1)
+    correction = 100 - row_sums
+    vals[:, -1] += correction
+
+    fig = go.Figure()
+
+    # One trace per Likert category, with text rendered INSIDE the bars
+    for i in range(5):
         fig.add_trace(
             go.Bar(
-                x=[xd[i]],
-                y=[yd],
+                x=vals[:, i],
+                y=questions,
                 orientation="h",
-                marker=dict(color=colors[i]),
+                marker=dict(color=COLORS[i]),
+                text=np.round(vals[:, i], 1),
+                texttemplate="%{text:.1f}%",
+                textposition="inside",
+                insidetextanchor="middle",
+                hoverinfo="skip",
+                constraintext="none",
+                cliponaxis=False,
             )
         )
 
-# Create a horizontal stacked bar chart
-fig.update_layout(
-    title=title,
-    title_font=title_font,
-    width=width, 
-    height=height,
-    barmode="stack",
-    paper_bgcolor=background_color,
-    plot_bgcolor=background_color,
-    margin=dict(l=1, r=180, t=100, b=80),
-    showlegend=False,
-    hovermode=False,
-    xaxis=dict(
-        showgrid=False,
-        showline=False,
-        showticklabels=False,
-        zeroline=False,
-        domain=[0.15, 1],
-    ),
-    yaxis=dict(
-        showgrid=False,
-        showline=False,
-        showticklabels=False,
-        zeroline=False,
-    ),
-)
+    fig.update_layout(
+        title="",
+        width=1100,
+        height=500,
+        barmode="stack",
+        paper_bgcolor=BACKGROUND_COLOR,
+        plot_bgcolor=BACKGROUND_COLOR,
+        margin=dict(l=180, r=30, t=90, b=60),
+        showlegend=False,
+        xaxis=dict(
+            range=[0, 100],
+            showgrid=False,
+            showline=False,
+            showticklabels=False,
+            zeroline=False,
+            fixedrange=True,
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showline=False,
+            showticklabels=True,   # show labels normally (no left annotations needed)
+            zeroline=False,
+            fixedrange=True,
+        ),
+#        uniformtext=dict(minsize=10, mode="hide"),  # hide text that won't fit
+        uniformtext=dict(minsize=6, mode="show")
+    )
 
-# Create and add annotations to plot
-annotations = []
-
-for yd, xd in zip(questions, values):
-    # Label the y-axis with the questions
-    
-    annotations.append(
-        dict(
-            xref="paper",
-            yref="y",
-            x=0.14,
-            y=yd,
-            xanchor="right",
-            text=str(yd),
-            font=questions_font,
-            showarrow=False,
-            align="right",
+    fig.update_xaxes(range=[-1, 100])
+    fig.update_yaxes(
+        tickfont=dict(
+            size=16,        # increase this
+            family="Helvetica",
+            color="black"
         )
     )
-    # Label the first percentage of the questions on the x-axis
-    annotations.append(
-        dict(
+    # Top Likert headers (safe to keep as annotations)
+    header_x = np.cumsum(vals[-1, :]) - vals[-1, :] / 2 if len(vals) else np.array([10, 30, 50, 70, 90])
+    for i in range(5):
+        fig.add_annotation(
+            x=float(header_x[i]),
+            y=1.12,
             xref="x",
-            yref="y",
-            x=(xd[0]) / 2,
-            y=yd,
-            text=str(xd[0]) + "%",
-            font=percent_font,
+            yref="paper",
+            text=LIKERT_LABELS[i],
             showarrow=False,
+            font=dict(family="Helvetica", size=14, color="black"),
         )
-    )
-    # Label the first Likert scale on the top
-    if yd == questions[-1]:
-        annotations.append(
-            dict(
-                xref="x",
-                yref="paper",
-                x= (xd[0]) / 2,
-                y=1.15,
-                text=labels[0],
-                font=likert_scale_font,
-                showarrow=False,
-            )
-        )
-    space = xd[0]
-    for i in range(1, len(xd)):
-        # Label the rest of the percentages of the questions on the x-axis
-        annotations.append(
-            dict(
-                xref="x",
-                yref="y",
-                x=space + (xd[i] / 2),
-                y=yd,
-                text=str(xd[i]) + "%",
-                font=percent_font,
-                showarrow=False,
-            )
-        )
-        # Label the rest of the Likert scale on the top
-        if yd == questions[-1]:
-            annotations.append(
-                dict(
-                    xref="x",
-                    yref="paper",
-                    x=space + (xd[i] / 2),
-                    y=1.15,
-                    text=labels[i],
-                    font=likert_scale_font,
-                    showarrow=False,
-                )
-            )
-        space += xd[i]
-fig.update_layout(annotations=annotations)
 
-# Show figure
-fig.write_image('figures/perceived_time_diff.png', scale=10)
+    fig.write_image(out_path, engine="kaleido", scale=4)
 
+
+def main():
+
+    db_path = sys.argv[1]
+    rows = fetch_rows(db_path)
+    group_ids, perc = compute_group_percentages(rows)
+
+    df = build_dataframe(group_ids, perc)
+
+
+    df = df.iloc[::-1].reset_index(drop=True)
+
+    row_sums = df[["a", "b", "c", "d", "e"]].sum(axis=1)
+
+    plot_likert_stacked(df, out_path="figures/perceived_time_diff.png")
+
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
